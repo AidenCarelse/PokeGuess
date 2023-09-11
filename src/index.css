@@ -1,13 +1,67 @@
-body {
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
+}
+/*h1 {
+  text-align: center;
+  background-color: black;
+  font-family: "Lucida Console";
+  font-size: 3rem;
+  color: white;
+  word-spacing: 30px;
+  letter-spacing: -5px;
+  padding: 2.4rem 0;
+}
+*/
+h3 {
+  color: white;
+  font-family: "Lucida Console";
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.app {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.add-form {
+  background-color: black;
+  padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.logo {
+  background-color: black;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  font-family: "Lucida Console";
+  font-size: 3rem;
+  color: white;
+  word-spacing: 30px;
+  letter-spacing: -5px;
+  padding: 2.4rem 0;
+}
+
+.logo p {
+  word-spacing: 10px;
+  font-size: 2rem;
+}
+
+input {
+  background-color: black;
+  border-color: white;
+  color: white;
+  border-width: 0.1px;
+  font-family: inherit;
+  border-radius: 0.3rem;
+  font-size: 1.8rem;
 }
