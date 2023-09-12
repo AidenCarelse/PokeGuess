@@ -43,7 +43,7 @@ function Menu() {
   return (
     <div className="menu">
       <div className="labelMenu">
-        <h3 className="guessLabel labelLeft" id="12345">NAME</h3>
+        <h3 className="guessLabel labelLeft">NAME</h3>
         <h3 className="guessLabel labelMid">GEN</h3>
         <h3 className="guessLabel labelMid">EVO. NUM</h3>
         <h3 className="guessLabel labelRight">TYPE(S)</h3>
