@@ -65,3 +65,61 @@ input {
   border-radius: 0.3rem;
   font-size: 1.8rem;
 }
+
+.menu {
+  background-color: black;
+  align-items: center;
+  padding-bottom: 50px;
+}
+
+.labelMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  color: white;
+  background-color: black;
+  font-family: "Lucida Console";
+}
+
+.guessLabel {
+  border: 1px solid gray;
+  margin-right: 5px;
+  margin-bottom: 10px;
+}
+
+.guessMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  color: white;
+  background-color: black;
+  font-family: "Lucida Console";
+}
+
+.guess {
+  border: 1px solid #30353c;
+  background-color: #30353c;
+  color: #30353c;
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+
+.labelLeft {
+  border-radius: 10px 0 0 10px;
+  padding: 10px 75px 10px 75px;
+}
+
+.labelMid {
+  padding: 10px;
+  padding: 10px 15px 10px 15px;
+}
+
+.labelRight {
+  border-radius: 0 10px 10px 0;
+  padding: 10px 50px 10px 50px;
+}
