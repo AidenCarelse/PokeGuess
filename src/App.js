@@ -1,5 +1,7 @@
 import "./index.css";
 
+const NUM_GUESSES = 10;
+
 function App() {
   return (
     <div className="app">
@@ -29,22 +31,26 @@ function Search() {
 }
 
 function Menu() {
+  const guesses = Array.from({ length: NUM_GUESSES}, (_, index) => (
+    <div className="guessMenu">
+      <h3 className="guess labelLeft">NAME</h3>
+      <h3 className="guess labelMid">GEN</h3>
+      <h3 className="guess labelMid">EVO. NUM</h3>
+      <h3 className="guess labelRight">TYPE(S)</h3>
+   </div>
+  ));
+
   return (
     <div className="menu">
-      <div className="labels">
-        <h3 className="guessLabelLeft">NAME</h3>
-        <h3 className="guessLabelMid">GEN</h3>
-        <h3 className="guessLabelMid">EVO. NUM</h3>
-        <h3 className="guessLabelRight">TYPE(S)</h3>
+      <div className="labelMenu">
+        <h3 className="guessLabel labelLeft" id="12345">NAME</h3>
+        <h3 className="guessLabel labelMid">GEN</h3>
+        <h3 className="guessLabel labelMid">EVO. NUM</h3>
+        <h3 className="guessLabel labelRight">TYPE(S)</h3>
       </div>
-      <div className="guesses">
-        <h3 className="guessLeft">NAME</h3>
-        <h3 className="guessMid">GEN</h3>
-        <h3 className="guessMid">EVO. NUM</h3>
-        <h3 className="guessRight">TYPE(S)</h3>
-      </div>
+      {guesses}
     </div>
-  )
+  );
 }
 
 export default App;
