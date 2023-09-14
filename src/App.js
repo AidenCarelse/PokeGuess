@@ -1,13 +1,26 @@
 import "./index.css";
 
+/* VARIABLES */
+
 const NUM_GUESSES = 10;
+var CURR_GUESS = 0;
+
+// The correct answer (temp values)
+var ANSWER_POKEMON = "Pikachu";
+var ANSWER_GENERATION = "I";
+var ANSWER_EVOLUTION_STAGE = "II";
+var ANSWER_TYPE = "Electric";
+
+
+
+/* FUNCTIONS */
 
 function App() {
   return (
     <div className="app">
-      <Header />
-      <Search />
-      <Menu />
+      <Header/>
+      <Search/>
+      <Menu/>
     </div>
   );
 }
@@ -22,10 +35,60 @@ function Header() {
 }
 
 function Search() {
+
+  // Sumbit a guess when the user presses enter
+  const onKeyPress = async (event) => {
+    if(event.key == 'Enter') {
+      const curr_label = event.target;
+      let value =curr_label.value;
+      curr_label.value = "";
+
+      curr_label.disabled = true;
+      await populateGuess(value, ANSWER_POKEMON);
+      await populateGuess(value, ANSWER_GENERATION);
+      await populateGuess(value, ANSWER_EVOLUTION_STAGE);
+      await populateGuess(value, ANSWER_TYPE);
+      curr_label.disabled = false;
+    }
+  };
+
+  // Fill a guess' value
+  async function populateGuess(value, expected) {
+    const curr_label = document.getElementsByClassName("guess").item(CURR_GUESS);
+    const width = curr_label.offsetWidth;
+    const height = curr_label.offsetHeight;
+    curr_label.textContent = value;
+
+    const animationDuration = 0.4;
+    curr_label.style.transition = "transform "+animationDuration+"s";
+    curr_label.style.transform = "rotateX(360deg)";
+
+    curr_label.style.padding = "10px 5px 10px 5px";
+    curr_label.style.width = width + "px";
+    curr_label.style.height = height + "px";
+
+    setLabelColour(curr_label, value, expected);
+
+    CURR_GUESS++;
+    await new Promise(r => setTimeout(() => r(), animationDuration*1000));
+  }
+
+  // Set a label's colour based on the guess' correctness
+  function setLabelColour(curr_label, value, expected) {
+    if(expected.toLowerCase() == value.toLowerCase()) {
+      curr_label.style.backgroundColor = "#5be38b"; //yellow: #ffc700
+      curr_label.style.color = "black";
+    }
+    else {
+      curr_label.style.color = "white";
+    }
+  }
+
+  // Return menu form
   return (
     <div className="add-form">
       <h3>Search for Pokemon</h3>
-      <input type="text" placeholder="Pokemon..."></input>
+      <input type="text" placeholder="Pokemon..." className="inputForm" onKeyUp={onKeyPress}></input>
     </div>
   );
 }
@@ -33,20 +96,20 @@ function Search() {
 function Menu() {
   const guesses = Array.from({ length: NUM_GUESSES}, (_, index) => (
     <div className="guessMenu">
-      <h3 className="guess labelLeft">NAME</h3>
-      <h3 className="guess labelMid">GEN</h3>
-      <h3 className="guess labelMid">EVO. NUM</h3>
-      <h3 className="guess labelRight">TYPE(S)</h3>
+      <div className="guess labelLeft">NAME</div>
+      <div className="guess labelMid">GEN</div>
+      <div className="guess labelMid">EVO. STAGE</div>
+      <div className="guess labelRight">TYPE(S)</div>
    </div>
   ));
 
   return (
     <div className="menu">
       <div className="labelMenu">
-        <h3 className="guessLabel labelLeft">NAME</h3>
-        <h3 className="guessLabel labelMid">GEN</h3>
-        <h3 className="guessLabel labelMid">EVO. NUM</h3>
-        <h3 className="guessLabel labelRight">TYPE(S)</h3>
+        <div className="guessLabel labelLeft">NAME</div>
+        <div className="guessLabel labelMid">GEN</div>
+        <div className="guessLabel labelMid">EVO. STAGE</div>
+        <div className="guessLabel labelRight">TYPE(S)</div>
       </div>
       {guesses}
     </div>
