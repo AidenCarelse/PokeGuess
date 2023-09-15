@@ -1,4 +1,6 @@
 import "./index.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 /* VARIABLES */
 
@@ -35,6 +37,14 @@ function Header() {
 }
 
 function Search() {
+  const [name, setName] = useState([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
+      setName(res.data.results);
+    });
+  }, []);
 
   // Sumbit a guess when the user presses enter
   const onKeyPress = async (event) => {
@@ -88,7 +98,33 @@ function Search() {
   return (
     <div className="add-form">
       <h3>Search for Pokemon</h3>
-      <input type="text" placeholder="Pokemon..." className="inputForm" onKeyUp={onKeyPress}></input>
+      <input type="text" placeholder="Pokemon..."></input>
+    </div>
+  );
+
+  return (
+    <div className="add-form">
+      <h3>Search for Pokemon</h3>
+      <input
+        type="text"
+        placeholder="Pokemon..."
+        onChange={(e) => setSearch(e.target.value)}
+        className="inputForm"
+        onKeyUp={onKeyPress}
+      ></input>
+      <div>
+        {name
+          .filter((item) => {
+            if (search === "") {
+              return !item;
+            } else if (item.name.toLowerCase().includes(search.toLowerCase())) {
+              return item;
+            }
+          })
+          .map((item) => {
+            return <h2>{item.name}</h2>;
+          })}
+      </div>
     </div>
   );
 }
