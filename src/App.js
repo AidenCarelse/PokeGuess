@@ -98,13 +98,6 @@ function Search() {
   return (
     <div className="add-form">
       <h3>Search for Pokemon</h3>
-      <input type="text" placeholder="Pokemon..."></input>
-    </div>
-  );
-
-  return (
-    <div className="add-form">
-      <h3>Search for Pokemon</h3>
       <input
         type="text"
         placeholder="Pokemon..."
