@@ -2,21 +2,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Arial";
 }
-/*h1 {
-  text-align: center;
-  background-color: black;
-  font-family: "Lucida Console";
-  font-size: 3rem;
-  color: white;
-  word-spacing: 30px;
-  letter-spacing: -5px;
-  padding: 2.4rem 0;
-}
-*/
+
 h3 {
   color: white;
-  font-family: "Lucida Console";
 }
 
 h2 {
@@ -40,6 +30,12 @@ h2 {
   gap: 1rem;
 }
 
+.inputForm {
+  padding: 5px;
+  border-radius: 10px; 
+  width: 630px;
+}
+
 .logo {
   background-color: black;
   display: flex;
@@ -47,7 +43,6 @@ h2 {
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  font-family: "Lucida Console";
   font-size: 3rem;
   color: white;
   word-spacing: 30px;
@@ -68,4 +63,66 @@ input {
   font-family: inherit;
   border-radius: 0.3rem;
   font-size: 1.8rem;
+}
+
+.menu {
+  background-color: black;
+  align-items: center;
+  padding-bottom: 100px;
+}
+
+.labelMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: white;
+  background-color: black;
+}
+
+.guessLabel {
+  border: 1px solid gray;
+  margin-right: 5px;
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.guessMenu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  color: white;
+  background-color: black;
+}
+
+.guess {
+  border: 1px solid #30353c;
+  background-color: #30353c;
+  color: #30353c;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: center;
+  font-size: 20px;
+}
+
+.labelLeft {
+  margin-left: 5px;
+  border-radius: 10px 0 0 10px; 
+  padding: 10px 75px 10px 75px; /*top, right, bottom, left */
+}
+
+.labelMid {
+  padding: 10px;
+  padding: 10px 15px 10px 15px;
+}
+
+.labelRight {
+  border-radius: 0 10px 10px 0;
+  padding: 10px 50px 10px 50px;
 }
