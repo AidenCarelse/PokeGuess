@@ -28,12 +28,19 @@ h2 {
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
+  padding-top: 15px;
 }
 
 .inputForm {
   padding: 5px;
   border-radius: 10px; 
-  width: 630px;
+  border-width: 2px;
+  width: 390px;
+}
+
+.inputForm:focus {
+  border-color:  #116ee0;
+  outline: 0 none;
 }
 
 .logo {
@@ -114,7 +121,7 @@ input {
 .labelLeft {
   margin-left: 5px;
   border-radius: 10px 0 0 10px; 
-  padding: 10px 75px 10px 75px; /*top, right, bottom, left */
+  padding: 10px 75px 10px 75px;
 }
 
 .labelMid {
@@ -125,4 +132,49 @@ input {
 .labelRight {
   border-radius: 0 10px 10px 0;
   padding: 10px 50px 10px 50px;
+}
+
+.dropDown {
+  background-color: #30353c;
+  border-radius: 5px;
+  width: 630px;
+  z-index: 999;
+  position: absolute;
+  top: 340px;
+  border: 1px solid black;
+}
+
+.menuItem {
+  font-size: 16px;
+  padding: 2.5px 10px 2.5px 10px;
+  border-radius: inherit;
+}
+
+.menuItem:hover {
+  background-color: 
+  #18191A;
+}
+
+.searchDiv {
+  display: flex;
+  flex-direction: row;
+}
+
+.counter {
+  padding: 15px 20px 15px 20px;
+  width: 120px;
+}
+
+.guessButton {
+  background-color: #116ee0;
+  border-radius: 10px;
+  padding: 15px 30px 15px 30px;
+  color: white;
+  font-weight: 1000;
+  border: none;
+  font-size: 16px;
+}
+
+.guessButton:hover {
+  cursor: pointer;
 }
