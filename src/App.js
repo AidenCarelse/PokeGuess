@@ -46,25 +46,34 @@ function Search() {
     });
   }, []);
 
-  // Sumbit a guess when the user presses enter
+  // Call submit guess button when user presses enter
   const onKeyPress = async (event) => {
     if(event.key == 'Enter') {
-      const curr_label = event.target;
-      let value =curr_label.value;
-      curr_label.value = "";
-
-      curr_label.disabled = true;
-      await populateGuess(value, ANSWER_POKEMON);
-      await populateGuess(value, ANSWER_GENERATION);
-      await populateGuess(value, ANSWER_EVOLUTION_STAGE);
-      await populateGuess(value, ANSWER_TYPE);
-      curr_label.disabled = false;
+      submitGuess();
     }
   };
 
+  // Submit a guess
+  async function submitGuess() {
+    const input =  document.getElementById("searchBar");
+    let value = input.value;
+    input.value = "";
+    setSearch("");
+
+    CURR_GUESS++;
+    document.getElementById("counter").textContent = CURR_GUESS +" of "+NUM_GUESSES;
+
+    input.disabled = true;
+    await populateGuess(value, ANSWER_POKEMON, 0);
+    await populateGuess(value, ANSWER_GENERATION, 1);
+    await populateGuess(value, ANSWER_EVOLUTION_STAGE, 2);
+    await populateGuess(value, ANSWER_TYPE, 3);
+    input.disabled = false;
+  }
+
   // Fill a guess' value
-  async function populateGuess(value, expected) {
-    const curr_label = document.getElementsByClassName("guess").item(CURR_GUESS);
+  async function populateGuess(value, expected, index) {
+    const curr_label = document.getElementsByClassName("guess").item((CURR_GUESS-1)*4+index);
     const width = curr_label.offsetWidth;
     const height = curr_label.offsetHeight;
     curr_label.textContent = value;
@@ -79,7 +88,6 @@ function Search() {
 
     setLabelColour(curr_label, value, expected);
 
-    CURR_GUESS++;
     await new Promise(r => setTimeout(() => r(), animationDuration*1000));
   }
 
@@ -94,28 +102,37 @@ function Search() {
     }
   }
 
+  // Handle the selection of a drop down menu item
+  const menuItemSelected = (event) => {
+    const input = document.getElementById("searchBar");
+    input.value = event.target.textContent;
+    setSearch(event.target.textContent);
+  }
+
   // Return menu form
   return (
     <div className="add-form">
-      <h3>Search for Pokemon</h3>
-      <input
-        type="text"
-        placeholder="Pokemon..."
-        onChange={(e) => setSearch(e.target.value)}
-        className="inputForm"
-        onKeyUp={onKeyPress}
-      ></input>
-      <div>
-        {name
-          .filter((item) => {
+      <h2 className="menuItem">Guess today's mystery Pokemon!</h2>
+      <div className="searchDiv">
+        <input type="text" placeholder="Guess Pokemon..." onChange={(e) => setSearch(e.target.value)}
+          className="inputForm" onKeyUp={onKeyPress} id="searchBar" spellCheck="false">
+        </input>
+        <h2 className="counter" id="counter">0 of 10</h2>
+        <button className="guessButton" onClick={() => submitGuess()}>GUESS</button>
+      </div>
+      <div className="dropDown" >
+        {name.filter((item) => {
             if (search === "") {
               return !item;
-            } else if (item.name.toLowerCase().includes(search.toLowerCase())) {
+            } else if (item.name.toLowerCase().includes(search.toLowerCase()) && item.name.toLowerCase() != search.toLowerCase()) {
               return item;
             }
           })
           .map((item) => {
-            return <h2>{item.name}</h2>;
+            return (
+              <h2 className="menuItem" onClick={menuItemSelected}>
+                {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+              </h2>);
           })}
       </div>
     </div>
