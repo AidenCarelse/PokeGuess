@@ -27,34 +27,64 @@ function App() {
 }
 
 function Header() {
+
+  // Show the instructions
   function showInstructions() {
     document.getElementById("instructions").style.visibility = 'visible';
   }
 
+  // Hide the instructions
   function hideInstructions() {
     document.getElementById("instructions").style.visibility = 'hidden';
   }
 
+  // Correct instructions example
+  const greenExample = (
+    <div className="guessMenu">
+      <div className="guess labelLeft">NAME</div>
+      <div className="guess labelMid correct">GEN</div>
+      <div className="guess labelMid correct">EVO. STAGE</div>
+      <div className="guess labelRight">TYPE(S)</div>
+    </div>
+  );
+
+  // Partial instructions example
+  const yellowExample = (
+    <div className="guessMenu">
+      <div className="guess labelLeft">NAME</div>
+      <div className="guess labelMid">GEN</div>
+      <div className="guess labelMid">EVO. STAGE</div>
+      <div className="guess labelRight partial">TYPE(S)</div>
+    </div>
+  );
+
+  // Instructions popup
+  const instructions = (
+    <div className="shadowBackground" id="instructions">
+    <div className="instructions">
+      <p className="closeButton" onClick={() => hideInstructions()}>✖</p>
+      <h5 className="title">HOW TO PLAY</h5>
+      <p className="instructionText">• Guess the mystery pokemon in 10 guesses!</p>
+      {greenExample}
+      <p className="instructionText">• Green means a correct match.</p>
+      {yellowExample}
+      <p className="instructionText">
+        • Yellow in the 'types' column means you have at least one type correct (Eg: guess has ice/water, answer is water/rock).<br></br><br></br>
+        • You can change which generations the mystery pokemon is chosen from.</p>
+      <button className="instructionsButton" onClick={() => hideInstructions()}>PLAY!</button>
+    </div>
+  </div>
+  );
+
+  // Return header & instructions form
   return (
     <div className="logo">
       <div className="horizontalDiv">
         <img src="images/pokeball.png" className="headerImageLeft"/>
-          <h1 className="redText">Poké</h1>
-          <h1>Guess</h1>
+        <h1 className="redText">Poké</h1>
+        <h1>Guess</h1>
         <img src="images/questionmark.png" className="headerImageRight" onClick={() => showInstructions()}/>
-        <div className="shadowBackground" id="instructions">
-          <div className="instructions">
-            <p className="closeButton" onClick={() => hideInstructions()}>✖</p>
-            <h5 className="title">HOW TO PLAY</h5>
-            <p className="instructionText">• Guess the mystery pokemon in 10 guesses!</p>
-            <div className="guessMenu"><div className="guess labelLeft">NAME</div><div className="guess labelMid correct">GEN</div><div className="guess labelMid correct">EVO. STAGE</div><div className="guess labelRight">TYPE(S)</div></div>
-            <p className="instructionText">• Green means a correct match.</p>
-            <div className="guessMenu"><div className="guess labelLeft">NAME</div><div className="guess labelMid">GEN</div><div className="guess labelMid">EVO. STAGE</div><div className="guess labelRight partial">TYPE(S)</div></div>
-            <p className="instructionText">• Yellow in the 'types' column means you have at least one type correct (Eg: guess has ice/water, answer is water/rock).</p>
-            <p className="instructionText">• You can change which generations the mystery pokemon is chosen from.</p>
-            <button className="instructionsButton" onClick={() => hideInstructions()}>PLAY!</button>
-          </div>
-        </div>
+        {instructions}
       </div>
       <p className="authors">BY AIDEN AND WILSON</p>
     </div>
@@ -66,7 +96,7 @@ function Search() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => { // TODO: 600 needs to be updated
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => { 
       setName(res.data.results);
     });
   }, []);
@@ -98,7 +128,7 @@ function Search() {
 
   // Fill a guess' value
   async function populateGuess(value, expected, index) {
-    const curr_label = document.getElementsByClassName("guess").item((CURR_GUESS-1)*4+index);
+    const curr_label = document.getElementsByClassName("guess real").item((CURR_GUESS-1)*4+index);
     const width = curr_label.offsetWidth;
     const height = curr_label.offsetHeight;
     curr_label.textContent = value;
@@ -167,10 +197,10 @@ function Search() {
 function Menu() {
   const guesses = Array.from({ length: 10}, (_, index) => (
     <div className="guessMenu">
-      <div className="guess labelLeft">NAME</div>
-      <div className="guess labelMid">GEN</div>
-      <div className="guess labelMid">EVO. STAGE</div>
-      <div className="guess labelRight">TYPE(S)</div>
+      <div className="guess labelLeft real">NAME</div>
+      <div className="guess labelMid real">GEN</div>
+      <div className="guess labelMid real">EVO. STAGE</div>
+      <div className="guess labelRight real">TYPE(S)</div>
    </div>
   ));
 
