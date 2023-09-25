@@ -13,6 +13,10 @@ h2 {
   color: white;
 }
 
+.redText {
+  color: #f23333;
+}
+
 .app {
   width: 100%;
   height: 100vh;
@@ -52,14 +56,12 @@ h2 {
   justify-content: center;
   font-size: 3rem;
   color: white;
-  word-spacing: 30px;
-  letter-spacing: -5px;
   padding: 2.4rem 0;
 }
 
-.logo p {
-  word-spacing: 10px;
-  font-size: 2rem;
+.authors {
+  word-spacing: 7.5px;
+  font-size: 24px;
 }
 
 input {
@@ -138,7 +140,7 @@ input {
   background-color: #30353c;
   border-radius: 5px;
   width: 630px;
-  z-index: 999;
+  z-index: 888;
   position: absolute;
   top: 340px;
   border: 1px solid black;
@@ -151,11 +153,10 @@ input {
 }
 
 .menuItem:hover {
-  background-color: 
-  #18191A;
+  background-color: #18191A;
 }
 
-.searchDiv {
+.horizontalDiv {
   display: flex;
   flex-direction: row;
 }
@@ -177,4 +178,91 @@ input {
 
 .guessButton:hover {
   cursor: pointer;
+}
+
+.headerImageLeft {
+  width: 75px;
+  height: 75px;
+  margin-top: 15px;
+  margin-right: 200px;
+}
+
+.headerImageRight {
+  width: 60px;
+  height: 60px;
+  margin-top: 22.5px;
+  margin-left: 200px;
+}
+
+.headerImageRight:hover {
+  cursor: pointer;
+}
+
+.shadowBackground {
+  background-color: rgba(0, 0, 0, 0.75);
+  position: absolute;
+  z-index: 999;
+  visibility: hidden;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.instructions {
+  background-color: black;
+  border: 1px solid gray;
+  border-radius: 10px;
+  width: 675px;
+  padding: 15px;
+}
+
+.instructionText {
+  font-size: 22px;
+  padding-top: 5px;
+  padding-bottom: 20px;
+  text-align: left;
+}
+
+.correct {
+  background-color: #5be38b;
+  color: #5be38b;
+}
+
+.partial {
+  background-color: #ffc700;
+  color: #ffc700;
+}
+
+.instructionsButton {
+  background-color: #116ee0;
+  border-radius: 20px;
+  padding: 15px 100px 15px 100px;
+  color: white;
+  font-weight: 1000;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.instructionsButton:hover {
+  cursor: pointer;
+}
+
+.closeButton {
+  font-size: 24px;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 10px;
+}
+
+.closeButton:hover {
+  cursor: pointer;
+}
+
+.title {
+  padding-bottom: 25px;
 }

@@ -4,7 +4,6 @@ import axios from "axios";
 
 /* VARIABLES */
 
-const NUM_GUESSES = 10;
 var CURR_GUESS = 0;
 
 // The correct answer (temp values)
@@ -28,10 +27,36 @@ function App() {
 }
 
 function Header() {
+  function showInstructions() {
+    document.getElementById("instructions").style.visibility = 'visible';
+  }
+
+  function hideInstructions() {
+    document.getElementById("instructions").style.visibility = 'hidden';
+  }
+
   return (
     <div className="logo">
-      <h1>PokeGuess</h1>
-      <p>By Aiden and Wilson</p>
+      <div className="horizontalDiv">
+        <img src="images/pokeball.png" className="headerImageLeft"/>
+          <h1 className="redText">Poké</h1>
+          <h1>Guess</h1>
+        <img src="images/questionmark.png" className="headerImageRight" onClick={() => showInstructions()}/>
+        <div className="shadowBackground" id="instructions">
+          <div className="instructions">
+            <p className="closeButton" onClick={() => hideInstructions()}>✖</p>
+            <h5 className="title">HOW TO PLAY</h5>
+            <p className="instructionText">• Guess the mystery pokemon in 10 guesses!</p>
+            <div className="guessMenu"><div className="guess labelLeft">NAME</div><div className="guess labelMid correct">GEN</div><div className="guess labelMid correct">EVO. STAGE</div><div className="guess labelRight">TYPE(S)</div></div>
+            <p className="instructionText">• Green means a correct match.</p>
+            <div className="guessMenu"><div className="guess labelLeft">NAME</div><div className="guess labelMid">GEN</div><div className="guess labelMid">EVO. STAGE</div><div className="guess labelRight partial">TYPE(S)</div></div>
+            <p className="instructionText">• Yellow in the 'types' column means you have at least one type correct (Eg: guess has ice/water, answer is water/rock).</p>
+            <p className="instructionText">• You can change which generations the mystery pokemon is chosen from.</p>
+            <button className="instructionsButton" onClick={() => hideInstructions()}>PLAY!</button>
+          </div>
+        </div>
+      </div>
+      <p className="authors">BY AIDEN AND WILSON</p>
     </div>
   );
 }
@@ -41,7 +66,7 @@ function Search() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => { // TODO: 600 needs to be updated
       setName(res.data.results);
     });
   }, []);
@@ -61,7 +86,7 @@ function Search() {
     setSearch("");
 
     CURR_GUESS++;
-    document.getElementById("counter").textContent = CURR_GUESS +" of "+NUM_GUESSES;
+    document.getElementById("counter").textContent = CURR_GUESS +" of 10";
 
     input.disabled = true;
     await populateGuess(value, ANSWER_POKEMON, 0);
@@ -112,8 +137,8 @@ function Search() {
   // Return menu form
   return (
     <div className="add-form">
-      <h2 className="menuItem">Guess today's mystery Pokemon!</h2>
-      <div className="searchDiv">
+      <h2 className="menuItem">Guess the mystery Pokemon!</h2>
+      <div className="horizontalDiv">
         <input type="text" placeholder="Guess Pokemon..." onChange={(e) => setSearch(e.target.value)}
           className="inputForm" onKeyUp={onKeyPress} id="searchBar" spellCheck="false">
         </input>
@@ -140,7 +165,7 @@ function Search() {
 }
 
 function Menu() {
-  const guesses = Array.from({ length: NUM_GUESSES}, (_, index) => (
+  const guesses = Array.from({ length: 10}, (_, index) => (
     <div className="guessMenu">
       <div className="guess labelLeft">NAME</div>
       <div className="guess labelMid">GEN</div>
