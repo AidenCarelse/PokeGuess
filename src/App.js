@@ -12,30 +12,63 @@ var ANSWER_GENERATION = "I";
 var ANSWER_EVOLUTION_STAGE = "II";
 var ANSWER_TYPE = "Electric";
 
-
-
 /* FUNCTIONS */
 
 function App() {
+  const [data, setData] = useState(null);
+  const [name, setName] = useState();
+  const [type, setType] = useState();
+  const [info, setInfo] = useState();
+  const [evo, setEvo] = useState();
+  const URL = "https://pokeapi.co/api/v2/pokemon/ditto";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let species_res;
+      try {
+        const response = await axios.get(URL);
+        setData(response.data);
+        setName(response.data.species.name);
+        console.log(response.data);
+
+        if (response.data && response.data.species) {
+          const species_res = await axios.get(response.data.species.url);
+          setInfo(species_res.data);
+          console.log(species_res.data);
+
+          if (species_res.data && species_res.data.evolution_chain) {
+            const evo_res = await axios.get(
+              species_res.data.evolution_chain.url
+            );
+            setEvo(evo_res.data);
+            console.log(evo_res.data);
+          }
+        }
+      } catch (error) {
+        window.alert(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="app">
-      <Header/>
-      <Search/>
-      <Menu/>
+      <Header />
+      <Search />
+      <Menu />
     </div>
   );
 }
 
 function Header() {
-
   // Show the instructions
   function showInstructions() {
-    document.getElementById("instructions").style.visibility = 'visible';
+    document.getElementById("instructions").style.visibility = "visible";
   }
 
   // Hide the instructions
   function hideInstructions() {
-    document.getElementById("instructions").style.visibility = 'hidden';
+    document.getElementById("instructions").style.visibility = "hidden";
   }
 
   // Correct instructions example
@@ -61,29 +94,45 @@ function Header() {
   // Instructions popup
   const instructions = (
     <div className="shadowBackground" id="instructions">
-    <div className="instructions">
-      <p className="closeButton" onClick={() => hideInstructions()}>✖</p>
-      <h5 className="title">HOW TO PLAY</h5>
-      <p className="instructionText">• Guess the mystery pokemon in 10 guesses!</p>
-      {greenExample}
-      <p className="instructionText">• Green means a correct match.</p>
-      {yellowExample}
-      <p className="instructionText">
-        • Yellow in the 'types' column means you have at least one type correct (Eg: guess has ice/water, answer is water/rock).<br></br><br></br>
-        • You can change which generations the mystery pokemon is chosen from.</p>
-      <button className="instructionsButton" onClick={() => hideInstructions()}>PLAY!</button>
+      <div className="instructions">
+        <p className="closeButton" onClick={() => hideInstructions()}>
+          ✖
+        </p>
+        <h5 className="title">HOW TO PLAY</h5>
+        <p className="instructionText">
+          • Guess the mystery pokemon in 10 guesses!
+        </p>
+        {greenExample}
+        <p className="instructionText">• Green means a correct match.</p>
+        {yellowExample}
+        <p className="instructionText">
+          • Yellow in the 'types' column means you have at least one type
+          correct (Eg: guess has ice/water, answer is water/rock).<br></br>
+          <br></br>• You can change which generations the mystery pokemon is
+          chosen from.
+        </p>
+        <button
+          className="instructionsButton"
+          onClick={() => hideInstructions()}
+        >
+          PLAY!
+        </button>
+      </div>
     </div>
-  </div>
   );
 
   // Return header & instructions form
   return (
     <div className="logo">
       <div className="horizontalDiv">
-        <img src="images/pokeball.png" className="headerImageLeft"/>
+        <img src="images/pokeball.png" className="headerImageLeft" />
         <h1 className="redText">Poké</h1>
         <h1>Guess</h1>
-        <img src="images/questionmark.png" className="headerImageRight" onClick={() => showInstructions()}/>
+        <img
+          src="images/questionmark.png"
+          className="headerImageRight"
+          onClick={() => showInstructions()}
+        />
         {instructions}
       </div>
       <p className="authors">BY AIDEN AND WILSON</p>
@@ -96,27 +145,27 @@ function Search() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => { 
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
       setName(res.data.results);
     });
   }, []);
 
   // Call submit guess button when user presses enter
   const onKeyPress = async (event) => {
-    if(event.key == 'Enter') {
+    if (event.key == "Enter") {
       submitGuess();
     }
   };
 
   // Submit a guess
   async function submitGuess() {
-    const input =  document.getElementById("searchBar");
+    const input = document.getElementById("searchBar");
     let value = input.value;
     input.value = "";
     setSearch("");
 
     CURR_GUESS++;
-    document.getElementById("counter").textContent = CURR_GUESS +" of 10";
+    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
 
     input.disabled = true;
     await populateGuess(value, ANSWER_POKEMON, 0);
@@ -128,13 +177,15 @@ function Search() {
 
   // Fill a guess' value
   async function populateGuess(value, expected, index) {
-    const curr_label = document.getElementsByClassName("guess real").item((CURR_GUESS-1)*4+index);
+    const curr_label = document
+      .getElementsByClassName("guess real")
+      .item((CURR_GUESS - 1) * 4 + index);
     const width = curr_label.offsetWidth;
     const height = curr_label.offsetHeight;
     curr_label.textContent = value;
 
     const animationDuration = 0.4;
-    curr_label.style.transition = "transform "+animationDuration+"s";
+    curr_label.style.transition = "transform " + animationDuration + "s";
     curr_label.style.transform = "rotateX(360deg)";
 
     curr_label.style.padding = "10px 5px 10px 5px";
@@ -143,16 +194,15 @@ function Search() {
 
     setLabelColour(curr_label, value, expected);
 
-    await new Promise(r => setTimeout(() => r(), animationDuration*1000));
+    await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
   }
 
   // Set a label's colour based on the guess' correctness
   function setLabelColour(curr_label, value, expected) {
-    if(expected.toLowerCase() == value.toLowerCase()) {
+    if (expected.toLowerCase() == value.toLowerCase()) {
       curr_label.style.backgroundColor = "#5be38b"; //yellow: #ffc700
       curr_label.style.color = "black";
-    }
-    else {
+    } else {
       curr_label.style.color = "white";
     }
   }
@@ -162,24 +212,38 @@ function Search() {
     const input = document.getElementById("searchBar");
     input.value = event.target.textContent;
     setSearch(event.target.textContent);
-  }
+  };
 
   // Return menu form
   return (
     <div className="add-form">
       <h2 className="menuItem">Guess the mystery Pokemon!</h2>
       <div className="horizontalDiv">
-        <input type="text" placeholder="Guess Pokemon..." onChange={(e) => setSearch(e.target.value)}
-          className="inputForm" onKeyUp={onKeyPress} id="searchBar" spellCheck="false">
-        </input>
-        <h2 className="counter" id="counter">0 of 10</h2>
-        <button className="guessButton" onClick={() => submitGuess()}>GUESS</button>
+        <input
+          type="text"
+          placeholder="Guess Pokemon..."
+          onChange={(e) => setSearch(e.target.value)}
+          className="inputForm"
+          onKeyUp={onKeyPress}
+          id="searchBar"
+          spellCheck="false"
+        ></input>
+        <h2 className="counter" id="counter">
+          0 of 10
+        </h2>
+        <button className="guessButton" onClick={() => submitGuess()}>
+          GUESS
+        </button>
       </div>
-      <div className="dropDown" >
-        {name.filter((item) => {
+      <div className="dropDown">
+        {name
+          .filter((item) => {
             if (search === "") {
               return !item;
-            } else if (item.name.toLowerCase().includes(search.toLowerCase()) && item.name.toLowerCase() != search.toLowerCase()) {
+            } else if (
+              item.name.toLowerCase().includes(search.toLowerCase()) &&
+              item.name.toLowerCase() != search.toLowerCase()
+            ) {
               return item;
             }
           })
@@ -187,7 +251,8 @@ function Search() {
             return (
               <h2 className="menuItem" onClick={menuItemSelected}>
                 {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-              </h2>);
+              </h2>
+            );
           })}
       </div>
     </div>
@@ -195,13 +260,13 @@ function Search() {
 }
 
 function Menu() {
-  const guesses = Array.from({ length: 10}, (_, index) => (
+  const guesses = Array.from({ length: 10 }, (_, index) => (
     <div className="guessMenu">
       <div className="guess labelLeft real">NAME</div>
       <div className="guess labelMid real">GEN</div>
       <div className="guess labelMid real">EVO. STAGE</div>
       <div className="guess labelRight real">TYPE(S)</div>
-   </div>
+    </div>
   ));
 
   return (
