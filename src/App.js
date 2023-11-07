@@ -15,46 +15,122 @@ var ANSWER_TYPE = "Electric";
 /* FUNCTIONS */
 
 function App() {
-  const [data, setData] = useState(null);
-  const [name, setName] = useState();
-  const [type, setType] = useState();
-  const [info, setInfo] = useState();
-  const [evo, setEvo] = useState();
-  const URL = "https://pokeapi.co/api/v2/pokemon/ditto";
+  const [pokemonData, setPokemonData] = useState(null);
+  const [search, setSearch] = useState("");
+  const [name, setName] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      let species_res;
-      try {
-        const response = await axios.get(URL);
-        setData(response.data);
-        setName(response.data.species.name);
-        console.log(response.data);
+  const handleSearch = async (query) => {
+    try {
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${query}`
+      );
+      setPokemonData(response.data);
+      setName(response.data.name);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+      setPokemonData(null);
+    }
+  };
+  function setLabelColour(curr_label, value, expected) {
+    if (expected.toLowerCase() == value.toLowerCase()) {
+      curr_label.style.backgroundColor = "#5be38b"; //yellow: #ffc700
+      curr_label.style.color = "black";
+    } else {
+      curr_label.style.color = "white";
+    }
+  }
+  // Fill a guess' value
+  async function populateGuess(value, expected, index) {
+    const curr_label = document
+      .getElementsByClassName("guess real")
+      .item((CURR_GUESS - 1) * 4 + index);
+    const width = curr_label.offsetWidth;
+    const height = curr_label.offsetHeight;
+    curr_label.textContent = value;
 
-        if (response.data && response.data.species) {
-          const species_res = await axios.get(response.data.species.url);
-          setInfo(species_res.data);
-          console.log(species_res.data);
+    const animationDuration = 0.4;
+    curr_label.style.transition = "transform " + animationDuration + "s";
+    curr_label.style.transform = "rotateX(360deg)";
 
-          if (species_res.data && species_res.data.evolution_chain) {
-            const evo_res = await axios.get(
-              species_res.data.evolution_chain.url
-            );
-            setEvo(evo_res.data);
-            console.log(evo_res.data);
+    curr_label.style.padding = "10px 5px 10px 5px";
+    curr_label.style.width = width + "px";
+    curr_label.style.height = height + "px";
+
+    setLabelColour(curr_label, value, expected);
+
+    await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
+  }
+
+  // Submit a guess
+  async function submitGuess() {
+    const input = document.getElementById("searchBar");
+    let value = input.value;
+    input.value = "";
+    setSearch("");
+    await handleSearch(value);
+    console.log(search);
+
+    CURR_GUESS++;
+    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+
+    input.disabled = true;
+    const promises = [
+      populateGuess(name, ANSWER_POKEMON, 0),
+      populateGuess(value, ANSWER_GENERATION, 1),
+      populateGuess(value, ANSWER_EVOLUTION_STAGE, 2),
+      populateGuess(value, ANSWER_TYPE, 3),
+    ];
+
+    await Promise.all(promises);
+    input.disabled = false;
+  }
+
+  /*useEffect(() => {
+      const URL = `https://pokeapi.co/api/v2/pokemon/${search}`;
+      const fetchData = async () => {
+        let species_res;
+        try {
+          const response = await axios.get(URL);
+          setData(response.data);
+          setName(response.data.species.name);
+          console.log(response.data);
+
+          if (response.data && response.data.species) {
+            const species_res = await axios.get(response.data.species.url);
+            setInfo(species_res.data);
+            console.log(species_res.data);
+
+            if (species_res.data && species_res.data.evolution_chain) {
+              const evo_res = await axios.get(
+                species_res.data.evolution_chain.url
+              );
+              setEvo(evo_res.data);
+              console.log(evo_res.data);
+            }
           }
+        } catch (error) {
+          window.alert(error);
         }
-      } catch (error) {
-        window.alert(error);
+      };
+      if (search) {
+        fetchData();
       }
-    };
-    fetchData();
-  }, []);
+    }, [search]);
+    return { data, name, info, evo };
+  }*/
 
   return (
     <div className="app">
       <Header />
-      <Search />
+      <Search
+        setSearch={setSearch}
+        search={search}
+        onSearch={handleSearch}
+        populateGues={populateGuess}
+        pokeName={name}
+        submitGuess={submitGuess}
+      />
       <Menu />
     </div>
   );
@@ -140,12 +216,20 @@ function Header() {
   );
 }
 
-function Search() {
+function Search({
+  search,
+  setSearch,
+  onSearch,
+  pokeData,
+  pokeName,
+  populateGuess,
+  submitGuess,
+}) {
   const [name, setName] = useState([]);
-  const [search, setSearch] = useState("");
+  /*const [search, setSearch] = useState("");*/
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=25").then((res) => {
       setName(res.data.results);
     });
   }, []);
@@ -157,55 +241,7 @@ function Search() {
     }
   };
 
-  // Submit a guess
-  async function submitGuess() {
-    const input = document.getElementById("searchBar");
-    let value = input.value;
-    input.value = "";
-    setSearch("");
-
-    CURR_GUESS++;
-    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
-
-    input.disabled = true;
-    await populateGuess(value, ANSWER_POKEMON, 0);
-    await populateGuess(value, ANSWER_GENERATION, 1);
-    await populateGuess(value, ANSWER_EVOLUTION_STAGE, 2);
-    await populateGuess(value, ANSWER_TYPE, 3);
-    input.disabled = false;
-  }
-
-  // Fill a guess' value
-  async function populateGuess(value, expected, index) {
-    const curr_label = document
-      .getElementsByClassName("guess real")
-      .item((CURR_GUESS - 1) * 4 + index);
-    const width = curr_label.offsetWidth;
-    const height = curr_label.offsetHeight;
-    curr_label.textContent = value;
-
-    const animationDuration = 0.4;
-    curr_label.style.transition = "transform " + animationDuration + "s";
-    curr_label.style.transform = "rotateX(360deg)";
-
-    curr_label.style.padding = "10px 5px 10px 5px";
-    curr_label.style.width = width + "px";
-    curr_label.style.height = height + "px";
-
-    setLabelColour(curr_label, value, expected);
-
-    await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
-  }
-
   // Set a label's colour based on the guess' correctness
-  function setLabelColour(curr_label, value, expected) {
-    if (expected.toLowerCase() == value.toLowerCase()) {
-      curr_label.style.backgroundColor = "#5be38b"; //yellow: #ffc700
-      curr_label.style.color = "black";
-    } else {
-      curr_label.style.color = "white";
-    }
-  }
 
   // Handle the selection of a drop down menu item
   const menuItemSelected = (event) => {
