@@ -1,0 +1,153 @@
+[33mcommit 5fa27025931d0de0d696b1bca6f1a0c2c39b954f[m[33m ([m[1;36mHEAD -> [m[1;32mdata[m[33m, [m[1;31morigin/data[m[33m)[m
+Author: WilsoAgya <wilsonagyapong16@gmail.com>
+Date:   Wed Oct 18 12:51:53 2023 -0700
+
+    Loaded in evolution and species data
+
+[33mcommit 96f5bf31ef265fdd84f7a5f4d1b619f2161db5b0[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Merge: 4b8ce8d 9a5c1a7
+Author: Wilson Agyapong <104797896+WilsoAgya@users.noreply.github.com>
+Date:   Sun Oct 15 22:16:42 2023 -0700
+
+    Merge pull request #7 from AidenCarelse/header
+    
+    Improved header UI and added instructions
+
+[33mcommit 9a5c1a7b121da4ccec3cb995b35cf805aff175db[m[33m ([m[1;31morigin/header[m[33m)[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Sun Sep 24 17:26:42 2023 -0700
+
+    Added images and comments, cleaned code
+
+[33mcommit 78c2e9e6ae95cc9cb7614dd4e0558daf2bc1f029[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Sun Sep 24 17:08:54 2023 -0700
+
+    Updated header UI and added instructions
+
+[33mcommit 4b8ce8d394aa8741085f13ae82d044f5232023fa[m
+Merge: dd208a1 3f346f9
+Author: Wilson Agyapong <104797896+WilsoAgya@users.noreply.github.com>
+Date:   Wed Sep 20 13:27:33 2023 -0700
+
+    Merge pull request #6 from AidenCarelse/dropdown
+    
+    Updated dropdown and searchbar UI/functionality
+
+[33mcommit 3f346f9ac76426de61c8ecdfa3faa02dd1bc7166[m[33m ([m[1;31morigin/dropdown[m[33m)[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Sat Sep 16 19:33:22 2023 -0700
+
+    Updated dropdown and searchbar UI/functionality
+
+[33mcommit dd208a132ecdac25223cc2ce0d67847905dc64ea[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Thu Sep 14 17:31:06 2023 -0700
+
+    Removed extra return statement
+
+[33mcommit 9c175ad4edb0f7098e73dc97d09a3b7490339408[m
+Merge: c48cb7c 7a5b86a
+Author: Aiden R Carelse <aidenrcarelse@gmail.com>
+Date:   Thu Sep 14 17:22:49 2023 -0700
+
+    Merge pull request #5 from AidenCarelse/api
+    
+    Search bar can now look up pokemon
+
+[33mcommit 7a5b86a613cd9e9c12dce7e1f75d4e40100730cd[m[33m ([m[1;31morigin/api[m[33m)[m
+Merge: 6ee3f15 c48cb7c
+Author: Aiden R Carelse <aidenrcarelse@gmail.com>
+Date:   Thu Sep 14 17:22:41 2023 -0700
+
+    Merge branch 'master' into api
+
+[33mcommit c48cb7c21f0172cbd6f8211b04d464d0b15904c0[m
+Merge: 8fa8107 a20b7bb
+Author: Wilson Agyapong <104797896+WilsoAgya@users.noreply.github.com>
+Date:   Thu Sep 14 15:16:50 2023 -0700
+
+    Merge pull request #4 from AidenCarelse/search
+    
+    Implemented basic search/input UI
+
+[33mcommit 6ee3f15d45965e4a0a9cc2f44c06c43a8c8d8bfc[m
+Author: WilsoAgya <wilsonagyapong16@gmail.com>
+Date:   Thu Sep 14 15:14:39 2023 -0700
+
+    Search bar can now look up pokemon
+
+[33mcommit a20b7bb135351beac2bb83e088d58784afc08ce9[m[33m ([m[1;31morigin/search[m[33m)[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Wed Sep 13 19:05:43 2023 -0700
+
+    Implemented basic search/input UI
+
+[33mcommit 8fa810734a394747c8e25f5fc8d85e71f1223f85[m
+Merge: 993d7ce 4eacabe
+Author: Wilson Agyapong <104797896+WilsoAgya@users.noreply.github.com>
+Date:   Mon Sep 11 22:17:05 2023 -0700
+
+    Merge pull request #3 from AidenCarelse/menu
+    
+    Added menu (guess labels and rows)
+
+[33mcommit 4eacabe1492468da0f6243a5b57a31766837edf2[m[33m ([m[1;31morigin/menu[m[33m)[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Mon Sep 11 22:15:20 2023 -0700
+
+    removed temporary id
+
+[33mcommit a040b539a2cd8f987347348c7c521990007d54e5[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Mon Sep 11 21:01:12 2023 -0700
+
+    Added support for multiple guess rows
+
+[33mcommit 016eed1418398fe42059494706761985bd40a3c4[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Sun Sep 10 23:13:26 2023 -0700
+
+    Added guess labels and row
+
+[33mcommit 993d7ce220ce0d17bdaf0bfc745dd348e975f404[m
+Merge: 0469074 6e0cfac
+Author: Wilson Agyapong <104797896+WilsoAgya@users.noreply.github.com>
+Date:   Sun Sep 10 21:56:02 2023 -0700
+
+    Merge pull request #2 from AidenCarelse/test
+    
+    Created header and search bar
+
+[33mcommit 6e0cfacd770de146621b1d50c1154aa8fa462e85[m[33m ([m[1;31morigin/test[m[33m)[m
+Author: WilsoAgya <wilsonagyapong16@gmail.com>
+Date:   Sun Sep 10 21:53:18 2023 -0700
+
+    Created header and search bar
+
+[33mcommit 04690740c8ef8032deec71eb080c4d2ce68ab135[m
+Merge: 9b1cc0c b1c1199
+Author: Wilson Agyapong <104797896+WilsoAgya@users.noreply.github.com>
+Date:   Fri Sep 8 22:15:04 2023 -0700
+
+    Merge pull request #1 from AidenCarelse/test
+    
+    test: test branch
+
+[33mcommit b1c11990f24985ae2cf6a0363fd448ca1cb86e19[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Fri Sep 8 22:13:26 2023 -0700
+
+    test: test branch
+
+[33mcommit 9b1cc0ce174b0e3f32e349faf6e0b87d9bb87b53[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Fri Sep 8 22:06:03 2023 -0700
+
+    Removed starter files
+
+[33mcommit 9b6cdb6292a874dd91906c4b4d65c02cc9d0943a[m
+Author: Aiden Carelse <aidenrcarelse@gmail.com>
+Date:   Fri Sep 8 21:57:55 2023 -0700
+
+    Initialize project using Create React App
