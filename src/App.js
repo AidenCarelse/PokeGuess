@@ -1,6 +1,7 @@
 import "./index.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { responsivePropType } from "react-bootstrap/esm/createUtilityClasses";
 
 /* VARIABLES */
 
@@ -15,110 +16,106 @@ var ANSWER_TYPE = "Electric";
 /* FUNCTIONS */
 
 function App() {
-  const [pokemonData, setPokemonData] = useState(null);
+  const [pokemonData, setPokemonData] = useState("");
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
 
-  const handleSearch = async (query) => {
-    try {
-      const response = await axios.get(
-        `https://pokeapi.co/api/v2/pokemon/${query}`
-      );
-      setPokemonData(response.data);
-      setName(response.data.name);
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-      setPokemonData(null);
+  function getEvoStages(stage, targetName, stages = [], stageNumber = 1) {
+    if (stage.species.name === targetName) {
+      // Check if the species matches the current Pokémon
+      stages.push({ stage: stageNumber });
     }
+    if (stage.evolves_to.length > 0) {
+      return getEvoStages(
+        stage.evolves_to[0],
+        targetName,
+        stages,
+        stageNumber + 1
+      );
+    } else {
+      return stages;
+    }
+  }
+
+  const handleSearch = async (query) => {
+    let pokemonName;
+    axios
+      .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
+      .then((res) => {
+        console.log(res.data);
+        const pokemonName = res.data.name;
+        setName(pokemonName);
+
+        // Use the updated name here
+        populateGuess(pokemonName, ANSWER_POKEMON, 0);
+        populateGuess(res.data.types[0].type.name, ANSWER_TYPE, 3);
+
+        return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
+      })
+
+      .then((speciesRes) => {
+        console.log(speciesRes.data);
+
+        const genName = speciesRes.data.generation.name;
+        const sliceName = genName.slice(11).toUpperCase();
+        populateGuess(sliceName, ANSWER_GENERATION, 1);
+
+        console.log(sliceName);
+
+        return axios.get(speciesRes.data.evolution_chain.url);
+      })
+      .then((evoRes) => {
+        console.log(evoRes.data.chain.evolves_to);
+        const evolutionStages = getEvoStages(
+          evoRes.data.chain.evolves_to,
+          pokemonName
+        );
+        populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);
+      })
+      .catch((error) => {
+        console.error(error);
+        setPokemonData(null);
+      });
   };
-  function setLabelColour(curr_label, value, expected) {
-    if (expected.toLowerCase() == value.toLowerCase()) {
+
+  async function setLabelColour(curr_label, value, expected) {
+    if (expected.toLowerCase() === value.toLowerCase()) {
       curr_label.style.backgroundColor = "#5be38b"; //yellow: #ffc700
       curr_label.style.color = "black";
     } else {
       curr_label.style.color = "white";
     }
   }
+
   // Fill a guess' value
-  async function populateGuess(value, expected, index) {
+  const populateGuess = (value, expected, index) => {
     const curr_label = document
       .getElementsByClassName("guess real")
       .item((CURR_GUESS - 1) * 4 + index);
-    const width = curr_label.offsetWidth;
-    const height = curr_label.offsetHeight;
-    curr_label.textContent = value;
 
-    const animationDuration = 0.4;
-    curr_label.style.transition = "transform " + animationDuration + "s";
-    curr_label.style.transform = "rotateX(360deg)";
+    console.log(curr_label);
 
-    curr_label.style.padding = "10px 5px 10px 5px";
-    curr_label.style.width = width + "px";
-    curr_label.style.height = height + "px";
+    if (curr_label) {
+      const width = curr_label.offsetWidth;
+      const height = curr_label.offsetHeight;
+      curr_label.textContent = value;
 
-    setLabelColour(curr_label, value, expected);
+      const animationDuration = 0.4;
+      curr_label.style.transition = "transform " + animationDuration + "s";
+      curr_label.style.transform = "rotateX(360deg)";
 
-    await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
-  }
+      curr_label.style.padding = "10px 5px 10px 5px";
+      curr_label.style.width = width + "px";
+      curr_label.style.height = height + "px";
 
-  // Submit a guess
-  async function submitGuess() {
-    const input = document.getElementById("searchBar");
-    let value = input.value;
-    input.value = "";
-    setSearch("");
-    await handleSearch(value);
-    console.log(search);
+      setLabelColour(curr_label, value, expected);
 
-    CURR_GUESS++;
-    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
-
-    input.disabled = true;
-    const promises = [
-      populateGuess(name, ANSWER_POKEMON, 0),
-      populateGuess(value, ANSWER_GENERATION, 1),
-      populateGuess(value, ANSWER_EVOLUTION_STAGE, 2),
-      populateGuess(value, ANSWER_TYPE, 3),
-    ];
-
-    await Promise.all(promises);
-    input.disabled = false;
-  }
-
-  /*useEffect(() => {
-      const URL = `https://pokeapi.co/api/v2/pokemon/${search}`;
-      const fetchData = async () => {
-        let species_res;
-        try {
-          const response = await axios.get(URL);
-          setData(response.data);
-          setName(response.data.species.name);
-          console.log(response.data);
-
-          if (response.data && response.data.species) {
-            const species_res = await axios.get(response.data.species.url);
-            setInfo(species_res.data);
-            console.log(species_res.data);
-
-            if (species_res.data && species_res.data.evolution_chain) {
-              const evo_res = await axios.get(
-                species_res.data.evolution_chain.url
-              );
-              setEvo(evo_res.data);
-              console.log(evo_res.data);
-            }
-          }
-        } catch (error) {
-          window.alert(error);
-        }
-      };
-      if (search) {
-        fetchData();
-      }
-    }, [search]);
-    return { data, name, info, evo };
-  }*/
+      new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
+    } else {
+      console.error("curr_label is null");
+      return;
+    }
+  };
 
   return (
     <div className="app">
@@ -127,9 +124,7 @@ function App() {
         setSearch={setSearch}
         search={search}
         onSearch={handleSearch}
-        populateGues={populateGuess}
-        pokeName={name}
-        submitGuess={submitGuess}
+        handleSearch={handleSearch}
       />
       <Menu />
     </div>
@@ -216,20 +211,12 @@ function Header() {
   );
 }
 
-function Search({
-  search,
-  setSearch,
-  onSearch,
-  pokeData,
-  pokeName,
-  populateGuess,
-  submitGuess,
-}) {
+function Search({ search, setSearch, submitGuess, handleSearch }) {
   const [name, setName] = useState([]);
   /*const [search, setSearch] = useState("");*/
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=25").then((res) => {
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
       setName(res.data.results);
     });
   }, []);
@@ -240,6 +227,25 @@ function Search({
       submitGuess();
     }
   };
+
+  // Submit a guess
+  async function submitGuess() {
+    const input = document.getElementById("searchBar");
+    let value = input.value;
+    input.value = "";
+    setSearch(value);
+    await handleSearch(value);
+    console.log(search);
+
+    /*populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);*/
+
+    CURR_GUESS++;
+    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+
+    input.disabled = true;
+
+    input.disabled = false;
+  }
 
   // Set a label's colour based on the guess' correctness
 
