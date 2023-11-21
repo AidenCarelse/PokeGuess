@@ -93,8 +93,6 @@ function App() {
       .getElementsByClassName("guess real")
       .item((CURR_GUESS - 1) * 4 + index);
 
-    console.log(curr_label);
-
     if (curr_label) {
       const width = curr_label.offsetWidth;
       const height = curr_label.offsetHeight;
@@ -231,10 +229,10 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
   // Submit a guess
   async function submitGuess() {
     const input = document.getElementById("searchBar");
-    let value = input.value;
+    let value = input.value.toLowerCase();
     input.value = "";
     setSearch(value);
-    await handleSearch(value);
+    handleSearch(value);
     console.log(search);
 
     /*populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);*/
