@@ -10,7 +10,7 @@ var CURR_GUESS = 0;
 // The correct answer (temp values)
 var ANSWER_POKEMON = "Pikachu";
 var ANSWER_GENERATION = "I";
-var ANSWER_EVOLUTION_STAGE = "II";
+var ANSWER_EVOLUTION_STAGE = "2/3";
 var ANSWER_TYPE = "Electric";
 
 /* FUNCTIONS */
@@ -20,57 +20,62 @@ function App() {
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
 
-  function getEvoStages(stage, targetName, stages = [], stageNumber = 1) {
-    if (stage.species.name === targetName) {
-      // Check if the species matches the current Pokémon
-      stages.push({ stage: stageNumber });
+  function getEvoStages(data, targetName, current)
+  {
+    current++;
+    if(data["species"]["name"] == targetName)
+    {
+      return JSON.stringify(current);
     }
-    if (stage.evolves_to.length > 0) {
-      return getEvoStages(
-        stage.evolves_to[0],
-        targetName,
-        stages,
-        stageNumber + 1
-      );
-    } else {
-      return stages;
+
+    for(let i = 0; i < data["evolves_to"].length; i++)
+    {
+      var str = getEvoStages(JSON.parse(JSON.stringify(data["evolves_to"][i])), targetName, current);
+
+      if(str != null)
+      {
+        return str;
+      }
     }
+
+    return null;
   }
 
   const handleSearch = async (query) => {
-    let pokemonName;
+    var pokemonName;
     axios
       .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
       .then((res) => {
-        console.log(res.data);
-        const pokemonName = res.data.name;
+        pokemonName = res.data.name;
         setName(pokemonName);
 
         // Use the updated name here
-        populateGuess(pokemonName, ANSWER_POKEMON, 0);
-        populateGuess(res.data.types[0].type.name, ANSWER_TYPE, 3);
+        populateGuess(pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1), ANSWER_POKEMON, 0);
+
+        var type = res.data.types[0].type.name;
+        type = type.charAt(0).toUpperCase() + type.slice(1);
+        if(res.data.types.length == 2)
+        {
+          const type2 = res.data.types[1].type.name;
+          type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
+        }
+
+        populateGuess(type, ANSWER_TYPE, 3);
 
         return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
       })
 
       .then((speciesRes) => {
-        console.log(speciesRes.data);
 
         const genName = speciesRes.data.generation.name;
         const sliceName = genName.slice(11).toUpperCase();
         populateGuess(sliceName, ANSWER_GENERATION, 1);
 
-        console.log(sliceName);
-
         return axios.get(speciesRes.data.evolution_chain.url);
       })
       .then((evoRes) => {
-        console.log(evoRes.data.chain.evolves_to);
-        const evolutionStages = getEvoStages(
-          evoRes.data.chain.evolves_to,
-          pokemonName
-        );
-        populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);
+        const evolutionStage = getEvoStages(JSON.parse(JSON.stringify(evoRes.data))["chain"], pokemonName, 0);
+        populateGuess(evolutionStage, ANSWER_EVOLUTION_STAGE, 2);
       })
       .catch((error) => {
         console.error(error);
@@ -78,13 +83,34 @@ function App() {
       });
   };
 
-  async function setLabelColour(curr_label, value, expected) {
-    if (expected.toLowerCase() === value.toLowerCase()) {
-      curr_label.style.backgroundColor = "#5be38b"; //yellow: #ffc700
+  async function setLabelColour(curr_label, value, expected, isTypes)
+  {
+    if (expected.toLowerCase() === value.toLowerCase())
+    {
+      curr_label.style.backgroundColor = "#5be38b"; 
       curr_label.style.color = "black";
-    } else {
-      curr_label.style.color = "white";
+      return;
     }
+    else if(isTypes)
+    {
+      var valueTypes = value.split('/');
+      var expectedTypes = expected.split('/');
+
+      for (var i = 0; i < expectedTypes.length; i++)
+      {
+        for (var j = 0; j < valueTypes.length; j++)
+        {
+          if(expectedTypes[i].toLowerCase() === valueTypes[j].toLowerCase())
+          {
+            curr_label.style.backgroundColor = "#ffc700";
+            curr_label.style.color = "black";
+            return;
+          }
+        }
+      }
+    }
+
+    curr_label.style.color = "white";
   }
 
   // Fill a guess' value
@@ -92,8 +118,6 @@ function App() {
     const curr_label = document
       .getElementsByClassName("guess real")
       .item((CURR_GUESS - 1) * 4 + index);
-
-    console.log(curr_label);
 
     if (curr_label) {
       const width = curr_label.offsetWidth;
@@ -108,7 +132,7 @@ function App() {
       curr_label.style.width = width + "px";
       curr_label.style.height = height + "px";
 
-      setLabelColour(curr_label, value, expected);
+      setLabelColour(curr_label, value, expected, index == 3);
 
       new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
     } else {
@@ -235,16 +259,11 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
     input.value = "";
     setSearch(value);
     await handleSearch(value);
-    console.log(search);
 
     /*populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);*/
 
     CURR_GUESS++;
     document.getElementById("counter").textContent = CURR_GUESS + " of 10";
-
-    input.disabled = true;
-
-    input.disabled = false;
   }
 
   // Set a label's colour based on the guess' correctness
