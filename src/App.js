@@ -255,10 +255,11 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
   // Submit a guess
   async function submitGuess() {
     const input = document.getElementById("searchBar");
-    let value = input.value;
+    let value = input.value.toLowerCase();
     input.value = "";
     setSearch(value);
-    await handleSearch(value);
+
+    handleSearch(value);
 
     /*populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);*/
 
