@@ -37,13 +37,13 @@ h2 {
 
 .inputForm {
   padding: 5px;
-  border-radius: 10px; 
+  border-radius: 10px;
   border-width: 2px;
   width: 390px;
 }
 
 .inputForm:focus {
-  border-color:  #116ee0;
+  border-color: #116ee0;
   outline: 0 none;
 }
 
@@ -122,7 +122,7 @@ input {
 
 .labelLeft {
   margin-left: 5px;
-  border-radius: 10px 0 0 10px; 
+  border-radius: 10px 0 0 10px;
   padding: 10px 75px 10px 75px;
 }
 
@@ -153,7 +153,7 @@ input {
 }
 
 .menuItem:hover {
-  background-color: #18191A;
+  background-color: #18191a;
 }
 
 .horizontalDiv {
@@ -265,4 +265,9 @@ input {
 
 .title {
   padding-bottom: 25px;
+}
+
+.error {
+  color: red;
+  text-align: left;
 }

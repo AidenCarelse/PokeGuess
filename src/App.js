@@ -16,24 +16,24 @@ var ANSWER_TYPE = "Electric";
 /* FUNCTIONS */
 
 function App() {
-  const [pokemonData, setPokemonData] = useState("");
   const [search, setSearch] = useState("");
-  const [name, setName] = useState("");
+  const [errors, setErrors] = useState("");
+  const [trigger, setTrigger] = useState(false);
 
-  function getEvoStages(data, targetName, current)
-  {
+  function getEvoStages(data, targetName, current) {
     current++;
-    if(data["species"]["name"] == targetName)
-    {
+    if (data["species"]["name"] == targetName) {
       return JSON.stringify(current);
     }
 
-    for(let i = 0; i < data["evolves_to"].length; i++)
-    {
-      var str = getEvoStages(JSON.parse(JSON.stringify(data["evolves_to"][i])), targetName, current);
+    for (let i = 0; i < data["evolves_to"].length; i++) {
+      var str = getEvoStages(
+        JSON.parse(JSON.stringify(data["evolves_to"][i])),
+        targetName,
+        current
+      );
 
-      if(str != null)
-      {
+      if (str != null) {
         return str;
       }
     }
@@ -47,15 +47,18 @@ function App() {
       .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
       .then((res) => {
         pokemonName = res.data.name;
-        setName(pokemonName);
+        //setName(pokemonName);
 
         // Use the updated name here
-        populateGuess(pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1), ANSWER_POKEMON, 0);
+        populateGuess(
+          pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1),
+          ANSWER_POKEMON,
+          0
+        );
 
         var type = res.data.types[0].type.name;
         type = type.charAt(0).toUpperCase() + type.slice(1);
-        if(res.data.types.length == 2)
-        {
+        if (res.data.types.length == 2) {
           const type2 = res.data.types[1].type.name;
           type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
         }
@@ -66,7 +69,6 @@ function App() {
       })
 
       .then((speciesRes) => {
-
         const genName = speciesRes.data.generation.name;
         const sliceName = genName.slice(11).toUpperCase();
         populateGuess(sliceName, ANSWER_GENERATION, 1);
@@ -74,34 +76,40 @@ function App() {
         return axios.get(speciesRes.data.evolution_chain.url);
       })
       .then((evoRes) => {
-        const evolutionStage = getEvoStages(JSON.parse(JSON.stringify(evoRes.data))["chain"], pokemonName, 0);
+        const evolutionStage = getEvoStages(
+          JSON.parse(JSON.stringify(evoRes.data))["chain"],
+          pokemonName,
+          0
+        );
         populateGuess(evolutionStage, ANSWER_EVOLUTION_STAGE, 2);
       })
       .catch((error) => {
         console.error(error);
-        setPokemonData(null);
+        setErrors("This pokemon does not exist");
+        setTrigger(true);
+
+        console.log(error.response);
+        //console.log(error.response.data);
+        /*if (error.response.data) {
+          setErrors(error.response.data);
+        }*/
+
+        <p>This pokemon does not exist</p>;
       });
   };
 
-  async function setLabelColour(curr_label, value, expected, isTypes)
-  {
-    if (expected.toLowerCase() === value.toLowerCase())
-    {
-      curr_label.style.backgroundColor = "#5be38b"; 
+  async function setLabelColour(curr_label, value, expected, isTypes) {
+    if (expected.toLowerCase() === value.toLowerCase()) {
+      curr_label.style.backgroundColor = "#5be38b";
       curr_label.style.color = "black";
       return;
-    }
-    else if(isTypes)
-    {
-      var valueTypes = value.split('/');
-      var expectedTypes = expected.split('/');
+    } else if (isTypes) {
+      var valueTypes = value.split("/");
+      var expectedTypes = expected.split("/");
 
-      for (var i = 0; i < expectedTypes.length; i++)
-      {
-        for (var j = 0; j < valueTypes.length; j++)
-        {
-          if(expectedTypes[i].toLowerCase() === valueTypes[j].toLowerCase())
-          {
+      for (var i = 0; i < expectedTypes.length; i++) {
+        for (var j = 0; j < valueTypes.length; j++) {
+          if (expectedTypes[i].toLowerCase() === valueTypes[j].toLowerCase()) {
             curr_label.style.backgroundColor = "#ffc700";
             curr_label.style.color = "black";
             return;
@@ -114,7 +122,7 @@ function App() {
   }
 
   // Fill a guess' value
-  const populateGuess = (value, expected, index) => {
+  const populateGuess = (value, expected, index, errors) => {
     const curr_label = document
       .getElementsByClassName("guess real")
       .item((CURR_GUESS - 1) * 4 + index);
@@ -149,6 +157,9 @@ function App() {
         search={search}
         onSearch={handleSearch}
         handleSearch={handleSearch}
+        errors={errors}
+        trigger={trigger}
+        setTrigger={setTrigger}
       />
       <Menu />
     </div>
@@ -235,7 +246,15 @@ function Header() {
   );
 }
 
-function Search({ search, setSearch, submitGuess, handleSearch }) {
+function Search({
+  search,
+  setSearch,
+  submitGuess,
+  handleSearch,
+  errors,
+  setTrigger,
+  trigger,
+}) {
   const [name, setName] = useState([]);
   /*const [search, setSearch] = useState("");*/
 
@@ -258,8 +277,25 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
     let value = input.value.toLowerCase();
     input.value = "";
     setSearch(value);
-
     handleSearch(value);
+
+    if (value === "") {
+      return console.log("Please enter a pokemon");
+    } else {
+      console.log("This works");
+    }
+    setTrigger("");
+
+    /*if (value) {
+      trigger();
+    }
+
+    /*if (value) {
+      console.log("Finding pokemon");
+    } else {
+      alert("The array does not exist!");
+      console.log("The array does not exist!");
+    }*/
 
     /*populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);*/
 
@@ -290,6 +326,7 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
           id="searchBar"
           spellCheck="false"
         ></input>
+
         <h2 className="counter" id="counter">
           0 of 10
         </h2>
@@ -297,6 +334,7 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
           GUESS
         </button>
       </div>
+
       <div className="dropDown">
         {name
           .filter((item) => {
@@ -317,6 +355,10 @@ function Search({ search, setSearch, submitGuess, handleSearch }) {
             );
           })}
       </div>
+
+      {trigger && (
+        <p className="error">Error: {errors ? errors : "No error"}</p>
+      )}
     </div>
   );
 }
