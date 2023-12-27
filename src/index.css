@@ -271,3 +271,7 @@ input {
   color: red;
   text-align: left;
 }
+
+#errorMessage {
+  color: red;
+}
