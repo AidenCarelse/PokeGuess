@@ -2,6 +2,7 @@ import "./index.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { responsivePropType } from "react-bootstrap/esm/createUtilityClasses";
+import { Container, Row, Col } from "react-bootstrap";
 
 /* VARIABLES */
 
@@ -18,8 +19,8 @@ var ANSWER_TYPE = "Electric";
 function App() {
   const [search, setSearch] = useState("");
   const [errors, setErrors] = useState("");
-  const [trigger, setTrigger] = useState(0);
-  //const [notFound, setNotFound] = useState(false);
+  const [trigger, setTrigger] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   function getEvoStages(data, targetName, current) {
     current++;
@@ -44,6 +45,7 @@ function App() {
 
   const handleSearch = async (query) => {
     var pokemonName;
+    setIsLoading(true);
 
     axios
       .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
@@ -89,17 +91,20 @@ function App() {
           if (err.response.status === 404) {
             setErrors("Pokemon not found");
             console.log("Pokemon not found");
-            //setTrigger(true);
+            setTrigger(true);
           }
         }
-
-        //setTrigger(false);
+        setTrigger(false);
 
         console.error(err);
         console.log(err.message);
 
         <p>This pokemon does not exist</p>;
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
+
     setErrors();
 
     //setTrigger(false);
@@ -168,6 +173,7 @@ function App() {
         trigger={trigger}
         setTrigger={setTrigger}
         setErrors={setErrors}
+        isLoading={isLoading}
       />
       <Menu />
     </div>
@@ -263,13 +269,14 @@ function Search({
   setTrigger,
   trigger,
   setErrors,
+  isLoading,
 }) {
   const [name, setName] = useState([]);
   const [empty, setEmpty] = useState();
   /*const [search, setSearch] = useState("");*/
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=1000").then((res) => {
       setName(res.data.results);
     });
   }, []);
@@ -286,8 +293,11 @@ function Search({
       setEmpty("Please enter a pokemon");
     } else {
       setEmpty();
-      CURR_GUESS++;
-      document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+
+      if (value.trim().length > 0) {
+        CURR_GUESS++;
+        document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+      }
     }
   }
 
@@ -309,60 +319,70 @@ function Search({
 
   // Return menu form
   return (
-    <div className="add-form">
-      <h2 className="menuItem">Guess the mystery Pokemon!</h2>
-      <div className="horizontalDiv">
-        <input
-          type="text"
-          placeholder="Guess Pokemon..."
-          onChange={(e) => setSearch(e.target.value)}
-          className="inputForm"
-          onKeyUp={onKeyPress}
-          id="searchBar"
-          spellCheck="false"
-        ></input>
+    <Container>
+      <Row>
+        <Col xs={12} md={6}>
+          <div className="add-form">
+            <h2 className="menuItem">Guess the mystery Pokemon!</h2>
+            <div className="horizontalDiv">
+              <input
+                type="text"
+                placeholder="Guess Pokemon..."
+                onChange={(e) => setSearch(e.target.value)}
+                className="inputForm"
+                onKeyUp={onKeyPress}
+                id="searchBar"
+                spellCheck="false"
+              ></input>
 
-        <h2 className="counter" id="counter">
-          0 of 10
-        </h2>
-        <button className="guessButton" onClick={submitGuess}>
-          GUESS
-        </button>
-      </div>
-
-      <div className="dropDown">
-        {name
-          .filter((item) => {
-            if (search === "") {
-              return !item;
-            } else if (
-              item.name.toLowerCase().includes(search.toLowerCase()) &&
-              item.name.toLowerCase() != search.toLowerCase()
-            ) {
-              return item;
-            }
-          })
-          .map((item) => {
-            return (
-              <h2 className="menuItem" onClick={menuItemSelected}>
-                {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+              <h2 className="counter" id="counter">
+                0 of 10
               </h2>
-            );
-          })}
-      </div>
+              <button
+                className="guessButton"
+                onClick={submitGuess}
+                disabled={isLoading}
+              >
+                GUESS
+              </button>
+            </div>
 
-      <div className="error">
-        {
-          //trigger === true && errors
-          errors
-        }
-        {
-          //trigger === 1 && errors
-          empty
-        }
-      </div>
-      {/* <div className="error">{errors && "This Pokemon does not exist"}</div>}*/}
-    </div>
+            <div className="dropDown">
+              {name
+                .filter((item) => {
+                  if (search === "") {
+                    return !item;
+                  } else if (
+                    item.name.toLowerCase().includes(search.toLowerCase()) &&
+                    item.name.toLowerCase() != search.toLowerCase()
+                  ) {
+                    return item;
+                  }
+                })
+                .map((item) => {
+                  return (
+                    <h2 className="menuItem" onClick={menuItemSelected}>
+                      {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                    </h2>
+                  );
+                })}
+            </div>
+
+            <div className="error">
+              {
+                //trigger === true && errors
+                errors
+              }
+              {
+                //trigger === 1 && errors
+                empty
+              }
+            </div>
+            {/* <div className="error">{errors && "This Pokemon does not exist"}</div>}*/}
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

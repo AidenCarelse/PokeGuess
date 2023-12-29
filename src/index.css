@@ -144,6 +144,8 @@ input {
   position: absolute;
   top: 340px;
   border: 1px solid black;
+  max-height: 390px;
+  overflow-y: auto;
 }
 
 .menuItem {
