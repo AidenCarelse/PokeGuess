@@ -2,6 +2,7 @@ import "./index.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { responsivePropType } from "react-bootstrap/esm/createUtilityClasses";
+import { Container, Row, Col } from "react-bootstrap";
 
 /* VARIABLES */
 
@@ -10,7 +11,7 @@ var CURR_GUESS = 0;
 // The correct answer (temp values)
 var ANSWER_POKEMON = "Pikachu";
 var ANSWER_GENERATION = "I";
-var ANSWER_EVOLUTION_STAGE = "2/3";
+var ANSWER_EVOLUTION_STAGE = "2";
 var ANSWER_TYPE = "Electric";
 
 /* FUNCTIONS */
@@ -19,6 +20,7 @@ function App() {
   const [search, setSearch] = useState("");
   const [errors, setErrors] = useState("");
   const [trigger, setTrigger] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   function getEvoStages(data, targetName, current) {
     current++;
@@ -43,13 +45,14 @@ function App() {
 
   const handleSearch = async (query) => {
     var pokemonName;
+    setIsLoading(true);
+
     axios
       .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
       .then((res) => {
-        pokemonName = res.data.name;
-        //setName(pokemonName);
-
         // Use the updated name here
+        pokemonName = res.data.name;
+
         populateGuess(
           pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1),
           ANSWER_POKEMON,
@@ -83,19 +86,28 @@ function App() {
         );
         populateGuess(evolutionStage, ANSWER_EVOLUTION_STAGE, 2);
       })
-      .catch((error) => {
-        console.error(error);
-        setErrors("This pokemon does not exist");
-        setTrigger(true);
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 404) {
+            setErrors("Pokemon not found");
+            console.log("Pokemon not found");
+            setTrigger(true);
+          }
+        }
+        setTrigger(false);
 
-        console.log(error.response);
-        //console.log(error.response.data);
-        /*if (error.response.data) {
-          setErrors(error.response.data);
-        }*/
+        console.error(err);
+        console.log(err.message);
 
         <p>This pokemon does not exist</p>;
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
+
+    setErrors();
+
+    //setTrigger(false);
   };
 
   async function setLabelColour(curr_label, value, expected, isTypes) {
@@ -160,6 +172,8 @@ function App() {
         errors={errors}
         trigger={trigger}
         setTrigger={setTrigger}
+        setErrors={setErrors}
+        isLoading={isLoading}
       />
       <Menu />
     </div>
@@ -254,54 +268,45 @@ function Search({
   errors,
   setTrigger,
   trigger,
+  setErrors,
+  isLoading,
 }) {
   const [name, setName] = useState([]);
+  const [empty, setEmpty] = useState();
   /*const [search, setSearch] = useState("");*/
 
   useEffect(() => {
-    axios.get("https://pokeapi.co/api/v2/pokemon?limit=600").then((res) => {
+    axios.get("https://pokeapi.co/api/v2/pokemon?limit=1000").then((res) => {
       setName(res.data.results);
     });
   }, []);
-
-  // Call submit guess button when user presses enter
-  const onKeyPress = async (event) => {
-    if (event.key == "Enter") {
-      submitGuess();
-    }
-  };
 
   // Submit a guess
   async function submitGuess() {
     const input = document.getElementById("searchBar");
     let value = input.value.toLowerCase();
     input.value = "";
-    setSearch(value);
-    handleSearch(value);
+    await setSearch(value);
+    await handleSearch(value);
 
-    if (value === "") {
-      return console.log("Please enter a pokemon");
+    if (search.trim().length === 0) {
+      setEmpty("Please enter a pokemon");
     } else {
-      console.log("This works");
+      setEmpty();
+
+      if (value.trim().length > 0) {
+        CURR_GUESS++;
+        document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+      }
     }
-    setTrigger("");
-
-    /*if (value) {
-      trigger();
-    }
-
-    /*if (value) {
-      console.log("Finding pokemon");
-    } else {
-      alert("The array does not exist!");
-      console.log("The array does not exist!");
-    }*/
-
-    /*populateGuess(evolutionStages, ANSWER_EVOLUTION_STAGE, 2);*/
-
-    CURR_GUESS++;
-    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
   }
+
+  // Call submit guess button when user presses enter
+  const onKeyPress = async (event) => {
+    if (event.key === "Enter") {
+      await submitGuess();
+    }
+  };
 
   // Set a label's colour based on the guess' correctness
 
@@ -314,52 +319,70 @@ function Search({
 
   // Return menu form
   return (
-    <div className="add-form">
-      <h2 className="menuItem">Guess the mystery Pokemon!</h2>
-      <div className="horizontalDiv">
-        <input
-          type="text"
-          placeholder="Guess Pokemon..."
-          onChange={(e) => setSearch(e.target.value)}
-          className="inputForm"
-          onKeyUp={onKeyPress}
-          id="searchBar"
-          spellCheck="false"
-        ></input>
+    <Container>
+      <Row>
+        <Col xs={12} md={6}>
+          <div className="add-form">
+            <h2 className="menuItem">Guess the mystery Pokemon!</h2>
+            <div className="horizontalDiv">
+              <input
+                type="text"
+                placeholder="Guess Pokemon..."
+                onChange={(e) => setSearch(e.target.value)}
+                className="inputForm"
+                onKeyUp={onKeyPress}
+                id="searchBar"
+                spellCheck="false"
+              ></input>
 
-        <h2 className="counter" id="counter">
-          0 of 10
-        </h2>
-        <button className="guessButton" onClick={() => submitGuess()}>
-          GUESS
-        </button>
-      </div>
-
-      <div className="dropDown">
-        {name
-          .filter((item) => {
-            if (search === "") {
-              return !item;
-            } else if (
-              item.name.toLowerCase().includes(search.toLowerCase()) &&
-              item.name.toLowerCase() != search.toLowerCase()
-            ) {
-              return item;
-            }
-          })
-          .map((item) => {
-            return (
-              <h2 className="menuItem" onClick={menuItemSelected}>
-                {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+              <h2 className="counter" id="counter">
+                0 of 10
               </h2>
-            );
-          })}
-      </div>
+              <button
+                className="guessButton"
+                onClick={submitGuess}
+                disabled={isLoading}
+              >
+                GUESS
+              </button>
+            </div>
 
-      {trigger && (
-        <p className="error">Error: {errors ? errors : "No error"}</p>
-      )}
-    </div>
+            <div className="dropDown">
+              {name
+                .filter((item) => {
+                  if (search === "") {
+                    return !item;
+                  } else if (
+                    item.name.toLowerCase().includes(search.toLowerCase()) &&
+                    item.name.toLowerCase() != search.toLowerCase()
+                  ) {
+                    return item;
+                  }
+                })
+                .map((item) => {
+                  return (
+                    <h2 className="menuItem" onClick={menuItemSelected}>
+                      {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                    </h2>
+                  );
+                })}
+            </div>
+
+            <div className="error">
+              {
+                //trigger === true && errors
+                errors
+              }
+              {
+                //trigger === 1 && errors
+                empty
+              }
+            </div>
+            {/* <div className="error">{errors && "This Pokemon does not exist"}</div>}*/}
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
