@@ -64,6 +64,16 @@ h2 {
   font-size: 24px;
 }
 
+.centreText {
+  font-size: 20px;
+  padding-bottom: 20px;
+}
+
+.guessResultText {
+  font-size: 15px;
+  margin-left: 5px;
+}
+
 input {
   background-color: black;
   border-color: white;
@@ -265,4 +275,40 @@ input {
 
 .title {
   padding-bottom: 25px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.concedeButton {
+  background-color: #116ee0;
+  border-radius: 10px;
+  padding: 15px 75px 15px 75px;
+  color: white;
+  font-weight: 1000;
+  border: none;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.concedeButton:hover {
+  cursor: pointer;
+}
+
+.padding30 {
+  padding: 30px;
+}
+
+.resultImage {
+  width: 150px;
+  height: 150px;
+  margin: 20px;
+  margin: 45px 20px 0px 50px;
+}
+
+.leftMargin {
+  margin-left: 50px;
 }
