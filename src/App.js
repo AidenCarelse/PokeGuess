@@ -57,6 +57,12 @@ function clearGuesses() {
     currGuess.style.backgroundColor = "#30353c"; 
     currGuess.style.color = "#30353c";
   }
+
+  var sprites = document.getElementsByClassName("guessImage");
+  for (var i = 0; i < sprites.length; i++) {
+    sprites[i].style.visibility = "hidden";
+    sprites[i].src = "images/loadingwheel.gif";
+  }
 }
 
 // End the game, won: 0 = guessed, 1 = ran out of guesses, 2 = gave up
@@ -309,6 +315,9 @@ function App() {
       setLabelColour(curr_label, value, expected, index);
 
       await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
+
+      curr_label.style.transition = 'none';
+      curr_label.style.transform = 'rotateX(0deg)';
     } else {
       console.error("curr_label is null");
       return;
@@ -492,7 +501,6 @@ function Search({
 
   // Submit a guess
   async function submitGuess() {
-
     if(document.getElementById("guessButton").textContent == "AGAIN") {
       clearGuesses();
     }
@@ -500,6 +508,7 @@ function Search({
       const input = document.getElementById("searchBar");
       let value = input.value.toLowerCase();
       input.value = "";
+
       await setSearch(value);
       await handleSearch(value);
 
