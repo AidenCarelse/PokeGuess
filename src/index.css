@@ -203,8 +203,16 @@ input {
   width: 60px;
   height: 60px;
   margin-top: 22.5px;
-  margin-left: 200px;
+  margin-left: 10px;
 }
+.headerImagegen{
+  width: 60px;
+  height: 60px;
+  margin-top: 22.5px;
+  margin-left: 100px;
+}
+
+
 
 .headerImageRight:hover {
   cursor: pointer;
@@ -231,6 +239,42 @@ input {
   width: 675px;
   padding: 15px;
 }
+
+.options{
+  background-color: black;
+  border: 1px solid gray;
+  border-radius: 10px;
+  width: 675px;
+  padding: 15px;
+}
+
+
+
+.optionMenu{
+  
+    /*display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    color: white;
+    background-color: black;*/
+    display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: white;
+  background-color: black;
+  
+}
+
+.optionText{
+  font-size:22px;
+  text-align:center;
+}
+
 
 .instructionText {
   font-size: 22px;
@@ -323,3 +367,5 @@ input {
 #errorMessage {
   color: red;
 }
+
+

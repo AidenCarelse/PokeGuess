@@ -14,6 +14,13 @@ var ANSWER_TYPE;
 var ANSWER_NUM;
 var ANSWER_SPRITE;
 
+var GEN_MIN = 1;
+var GEN_MAX = 9;
+
+
+//const[minValue , setMinValue] = useState(0);
+//const[maxValue, setMaxValue] = useState(9);
+
 /* FUNCTIONS */
 
 function endGame(won) {
@@ -52,10 +59,13 @@ function endGame(won) {
 }
 
 function App() {
+  const[minValue , setMinValue] = useState(0);
+const[maxValue, setMaxValue] = useState(9);
   const [search, setSearch] = useState("");
   const [errors, setErrors] = useState("");
   const [trigger, setTrigger] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
 
   function getEvoStages(data, targetName, current) {
     current++;
@@ -252,7 +262,11 @@ function App() {
 
   return (
     <div className="app">
-      <Header />
+      <Header 
+      minValue = {minValue}
+      maxValue = {maxValue}
+      setMinValue = {setMinValue}
+      setMaxValue = {setMaxValue}/>
       <Search
         setSearch={setSearch}
         search={search}
@@ -269,11 +283,23 @@ function App() {
   );
 }
 
-function Header() {
+function Header({setMinValue,setMaxValue,minValue,maxValue}) {
   // Show the instructions
   function showInstructions() {
     document.getElementById("instructions").style.visibility = "visible";
     document.getElementById("instructions").style.height = '100%';
+  }
+
+  //Show the generation options
+  function showOptions(){
+    document.getElementById("options").style.visibility = "visible";
+    document.getElementById("options").style.height= '100%';
+  }
+
+  //Hide the generation options
+  function hideOptions(){
+    document.getElementById("options").style.visibility = "hidden";
+
   }
 
   // Hide the instructions
@@ -305,6 +331,124 @@ function Header() {
       <div className="guess labelRight partial">TYPE(S)</div>
     </div>
   );
+
+  const generationminChoice = (min) => {
+    let result;
+    switch(true){
+      case min === 0:
+        return result = 1;
+        break;
+      case min === 1:
+        return result = 151;
+        break;
+      case min === 2:
+       return result = 251;
+       break;
+      case min === 3:
+        return result = 386;
+        break;
+      case min === 4:
+        return result = 493;
+        break;
+      case min === 5:
+        return result = 649;
+        break;
+      case min === 6:
+        return result = 721;
+        break;
+      case min === 7:
+        return result = 809;
+        break;
+      case min ===8:
+        return result = 905;
+        break;
+      case min === 9:
+        return result = 1015;
+        break;       
+      
+    return result;
+
+  }
+}
+
+  const generationmaxChoice = (max) => {
+
+    let result2;
+    switch(true){
+    case max === 1:
+        return result2 = 151;
+        break;
+      case max === 2:
+       return result2 = 251;
+       break;
+      case max === 3:
+        return result2 = 386;
+        break;
+      case max === 4:
+        return result2 = 493;
+        break;
+      case max === 5:
+        return result2 = 649;
+        break;
+      case max === 6:
+        return result2 = 721;
+        break;
+      case max === 7:
+        return result2 = 809;
+        break;
+      case max ===8:
+        return result2 = 905;
+        break;
+      case max === 9:
+        return result2 = 1015;
+        break;       
+         default:
+          result2 = 0;
+    }
+    return result2;
+  } 
+  const handleMinChange = (event) => {
+    GEN_MIN = generationminChoice(parseInt(event.target.value));
+  }
+  const handleMaxChange = (event) => {
+    GEN_MAX = generationmaxChoice(parseInt(event.target.value));
+  };
+
+  const optionPicker = () => (
+    <div className="optionMenu">
+      <div className="optionGroup">
+        <label className="optionText">Min:</label>
+        <input type="number" id="quantity" name="quantity" min="0" max="9" step="1" value={minValue} onChange={handleMinChange} />
+      </div>
+      <div className="optionGroup">
+        <label className="optionText">Max:</label>
+        <input type="number" id="quantity" name="quantity" min="0" max="9" step="1" value={maxValue} onChange={handleMaxChange} />
+      </div>
+    </div>
+  );
+  const options = (
+    <div className="shadowBackground" id="options">
+      <div className="options">
+        <p className="closeButton" onClick={() => hideOptions()}>
+          ✖
+        </p>
+        <h5 className="title">GENERATION OPTIONS</h5>
+        <p className="optionText">
+          Choose the generation range of the mystery Pokemon!
+        </p>
+        {optionPicker}
+        
+        
+        <button
+          className="instructionsButton"
+          onClick={() => hideOptions()}
+        >
+          PLAY!
+        </button>
+      </div>
+    </div>
+    
+  )
 
   // Instructions popup
   const instructions = (
@@ -378,12 +522,17 @@ function Header() {
         <img src="images/pokeball.png" className="headerImageLeft" />
         <h1 className="redText">Poké</h1>
         <h1>Guess</h1>
+        <img src = "images/gear.png"
+        className = "headerImagegen" 
+        onClick = {() => showOptions()}
+        ></img>
         <img
           src="images/questionmark.png"
           className="headerImageRight"
           onClick={() => showInstructions()}
         />
         {instructions}
+        {options}
         {gameEnd}
       </div>
       <p className="authors">BY AIDEN AND WILSON</p>
