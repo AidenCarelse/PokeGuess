@@ -39,7 +39,8 @@ h2 {
   padding: 5px;
   border-radius: 10px;
   border-width: 2px;
-  width: 390px;
+  width: 450px;
+  margin-left: 20px;
 }
 
 .inputForm:focus {
@@ -317,6 +318,12 @@ input {
   height: 150px;
   margin: 20px;
   margin: 45px 20px 0px 50px;
+}
+
+.guessImage {
+  width: 25px;
+  height: 25px;
+  margin-bottom: 5px;
 }
 
 .leftMargin {
