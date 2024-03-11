@@ -145,6 +145,8 @@ function App() {
 
   const handleSearch = async (query) =>
   {
+    document.getElementsByClassName("guessImage")[CURR_GUESS + 1].style.visibility = "visible";
+
     // Generate a new mystery pokemon at the start of the game
     if(CURR_GUESS == 0)
     {
@@ -178,15 +180,15 @@ function App() {
     }
     
     var pokemonName;
+    let values = new Array(5);
     setIsLoading(true);
 
     await axios
       .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
       .then((res) => {
-        // Use the updated name here
         pokemonName = res.data.name;
 
-        populateGuess(pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1), ANSWER_POKEMON,0);
+        values[0] = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
 
         var type = res.data.types[0].type.name;
         type = type.charAt(0).toUpperCase() + type.slice(1);
@@ -195,17 +197,17 @@ function App() {
           type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
         }
 
-        populateGuess(type, ANSWER_TYPE, 4);
-        populateGuess(String(res.data.id), String(ANSWER_NUM), 3);
+        values[3] = String(res.data.id);
+        values[4] = type;
+
         document.getElementsByClassName("guessImage")[CURR_GUESS + 1].src = res.data.sprites["other"]["official-artwork"]["front_default"];
-        document.getElementsByClassName("guessImage")[CURR_GUESS + 1].style.visibility = "visible";
 
         return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
       })
       .then((speciesRes) => {
         const genName = speciesRes.data.generation.name;
         const sliceName = genName.slice(11).toUpperCase();
-        populateGuess(sliceName, ANSWER_GENERATION, 1);
+        values[1] = sliceName;
 
         return axios.get(speciesRes.data.evolution_chain.url);
       })
@@ -215,7 +217,7 @@ function App() {
           pokemonName,
           0
         );
-        populateGuess(evolutionStage, ANSWER_EVOLUTION_STAGE, 2);
+        values[2] = evolutionStage;
       })
       .catch((err) => {
         if (err.response) {
@@ -235,6 +237,12 @@ function App() {
       .finally(() => {
         setIsLoading(false);
       });
+
+      await populateGuess(values[0], ANSWER_POKEMON, 0);
+      await populateGuess(values[1], ANSWER_GENERATION, 1);
+      await populateGuess(values[2], ANSWER_EVOLUTION_STAGE, 2);
+      await populateGuess(values[3], String(ANSWER_NUM), 3);
+      await populateGuess(values[4], ANSWER_TYPE, 4);
 
       if(pokemonName == ANSWER_POKEMON.toLowerCase())
       {
@@ -280,7 +288,7 @@ function App() {
   }
 
   // Fill a guess' value
-  const populateGuess = (value, expected, index, errors) => {
+  const populateGuess = async (value, expected, index, errors) => {
     const curr_label = document
       .getElementsByClassName("guess real")
       .item((CURR_GUESS) * 5 + index);
@@ -300,7 +308,7 @@ function App() {
 
       setLabelColour(curr_label, value, expected, index);
 
-      new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
+      await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
     } else {
       console.error("curr_label is null");
       return;
@@ -603,7 +611,7 @@ function Menu() {
 
   const guesses = Array.from({ length: 10 }, (_, index) => (
     <div className="guessMenu">
-      <img src="images/pokeball.png" className="guessImage invisible" />
+      <img src="images/loadingwheel.gif" className="guessImage invisible" />
       <div className="guess labelLeft real">NAME</div>
       <div className="guess labelMid real">GEN</div>
       <div className="guess labelMid real">EVO.</div>
