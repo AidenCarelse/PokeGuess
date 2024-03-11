@@ -197,6 +197,8 @@ function App() {
 
         populateGuess(type, ANSWER_TYPE, 4);
         populateGuess(String(res.data.id), String(ANSWER_NUM), 3);
+        document.getElementsByClassName("guessImage")[CURR_GUESS + 1].src = res.data.sprites["other"]["official-artwork"]["front_default"];
+        document.getElementsByClassName("guessImage")[CURR_GUESS + 1].style.visibility = "visible";
 
         return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
       })
@@ -380,7 +382,7 @@ function Header() {
           • Guess the mystery pokemon in 10 guesses!
         </p>
         {greenExample}
-        <p className="instructionText">• Green means a correct match. The 'EVO.' column refers to a pokemon's stage in their evolution chain (Eg: Pikachu = 1, Raichu = 2).</p>
+        <p className="instructionText">• Green means a correct match. The 'EVO.' column refers to a pokemon's stage in their evolution chain (Eg: Chamander = 1, Charizard = 3).</p>
         {yellowExample1}
         <p className="instructionText">
           • Yellow in the 'types' column means you have at least one type
@@ -601,6 +603,7 @@ function Menu() {
 
   const guesses = Array.from({ length: 10 }, (_, index) => (
     <div className="guessMenu">
+      <img src="images/pokeball.png" className="guessImage invisible" />
       <div className="guess labelLeft real">NAME</div>
       <div className="guess labelMid real">GEN</div>
       <div className="guess labelMid real">EVO.</div>
@@ -612,6 +615,7 @@ function Menu() {
   return (
     <div className="menu">
       <div className="labelMenu">
+        <img src="images/pokeball.png" className="guessImage invisible" />
         <div className="guessLabel labelLeft">NAME</div>
         <div className="guessLabel labelMid">GEN</div>
         <div className="guessLabel labelMid">EVO.</div>
