@@ -16,17 +16,64 @@ var ANSWER_SPRITE;
 
 /* FUNCTIONS */
 
-function endGame(won) {
-  document.getElementById("gameEnd").style.visibility = "visible";
+// Hide the reults
+function hideResults() {
+  document.getElementById("gameEnd").style.visibility = "hidden";
+}
 
-  if(won)
-  {
-    document.getElementById("resultText").textContent = "You successfully found the mystery pokemon in " + CURR_GUESS + " guesses!";
+// Restart the game
+function clearGuesses() {
+  hideResults();
+  document.getElementById("guessButton").textContent = "GUESS"
+  document.getElementById("searchBar").disabled = false;
+
+  // Reset the turns
+  CURR_GUESS = 0;
+  document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+
+  // Clear the guesses
+  var guesses = document.getElementsByClassName("guess real");
+  for (var i = 0; i < guesses.length; i++) {
+    var currGuess = guesses.item(i);
+
+    switch(i % 4) {
+      case (0):
+        currGuess.textContent = "NAME";
+        break;
+      case (1):
+        currGuess.textContent = "GEN";
+        break;
+      case (2):
+        currGuess.textContent = "EVO. STAGE";
+        break;
+      case (3):
+        currGuess.textContent = "TYPE(S)";
+        break;
+    }
+
+    currGuess.style.backgroundColor = "#30353c"; 
+    currGuess.style.color = "#30353c";
+  }
+}
+
+// End the game, won: 0 = guessed, 1 = ran out of guesses, 2 = gave up
+function endGame(won) {
+  document.getElementById("guessButton").textContent = "AGAIN";
+  document.getElementById("searchBar").disabled = true;
+
+  window.scrollTo(0, window.innerHeight * 0.33);
+
+  if(won == 0) {
+    document.getElementById("resultText").textContent = "You successfully found the mystery Pokemon in " + (CURR_GUESS + 1) + " guesses!";
     document.getElementById("resultText").style.color = "#5be38b";
   }
-  else
-  {
-    document.getElementById("resultText").textContent = "You ran out of guesses, better luck next time!";
+  else {
+    if(won == 1) {
+      document.getElementById("resultText").textContent = "You ran out of guesses, better luck next time!";
+    }
+    else {
+      document.getElementById("resultText").textContent = "This was the mystery Pokemon!";
+    }
     document.getElementById("resultText").style.color = "#f23333";
   }
 
@@ -49,6 +96,8 @@ function endGame(won) {
 
     results.item(i).style.color = colour;
   }
+
+  document.getElementById("gameEnd").style.visibility = "visible";
 }
 
 function App() {
@@ -187,11 +236,11 @@ function App() {
 
       if(pokemonName == ANSWER_POKEMON.toLowerCase())
       {
-        endGame(true);
+        endGame(0);
       }
-      else if (CURR_GUESS == 10)
+      else if (CURR_GUESS + 1 == 10)
       {
-        endGame(false);
+        endGame(1);
       }
     
     setErrors();
@@ -281,11 +330,6 @@ function Header() {
     document.getElementById("instructions").style.visibility = "hidden";
   }
 
-  // Hide the reults
-  function hideResults() {
-    document.getElementById("gameEnd").style.visibility = "hidden";
-  }
-
   // Correct instructions example
   const greenExample = (
     <div className="guessMenu">
@@ -367,6 +411,7 @@ function Header() {
             <p className="instructionText" id="resultNum">• Pokedex #</p>
           </div>
         </div>
+        <button className="guessButton" onClick={() => clearGuesses()}>PLAY AGAIN</button>
       </div>
     </div>
   );
@@ -414,20 +459,27 @@ function Search({
 
   // Submit a guess
   async function submitGuess() {
-    const input = document.getElementById("searchBar");
-    let value = input.value.toLowerCase();
-    input.value = "";
-    await setSearch(value);
-    await handleSearch(value);
 
-    if (search.trim().length === 0) {
-      setEmpty("Please enter a pokemon");
-    } else {
-      setEmpty();
+    if(document.getElementById("guessButton").textContent == "AGAIN") {
+      clearGuesses();
+    }
+    else {
+      const input = document.getElementById("searchBar");
+      let value = input.value.toLowerCase();
+      input.value = "";
+      await setSearch(value);
+      await handleSearch(value);
 
-      if (value.trim().length > 0) {
-        CURR_GUESS++;
-        document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+      if (search.trim().length === 0) {
+        setEmpty("Please enter a pokemon");
+      } else {
+        setEmpty();
+
+        if (value.trim().length > 0) {
+          CURR_GUESS++;
+          document.getElementById("concede").style.visibility = "visible";
+          document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+        }
       }
     }
   }
@@ -471,6 +523,7 @@ function Search({
               </h2>
               <button
                 className="guessButton"
+                id="guessButton"
                 onClick={submitGuess}
                 disabled={isLoading}
               >
@@ -520,39 +573,7 @@ function Search({
 function Menu() {
 
   function concede() {
-    endGame(false);
-
-    //clearGuesses();
-  }
-
-  function clearGuesses() {
-    // Reset the turns
-    CURR_GUESS = 0;
-    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
-
-    // Clear the guesses
-    var guesses = document.getElementsByClassName("guess real");
-    for (var i = 0; i < guesses.length; i++) {
-      var currGuess = guesses.item(i);
-
-      switch(i % 4) {
-        case (0):
-          currGuess.textContent = "NAME";
-          break;
-        case (1):
-          currGuess.textContent = "GEN";
-          break;
-        case (2):
-          currGuess.textContent = "EVO. STAGE";
-          break;
-        case (3):
-          currGuess.textContent = "TYPE(S)";
-          break;
-      }
-
-      currGuess.style.backgroundColor = "#30353c"; 
-      currGuess.style.color = "#30353c";
-    }
+    endGame(2);
   }
 
   const guesses = Array.from({ length: 10 }, (_, index) => (
@@ -574,7 +595,7 @@ function Menu() {
       </div>
       {guesses}
       <div className="footer">
-        <button className="concedeButton" onClick={concede}>GIVE UP</button>
+        <button className="concedeButton" id="concede" onClick={concede}>GIVE UP</button>
       </div>
     </div>
   );
