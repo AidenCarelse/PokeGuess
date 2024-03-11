@@ -36,7 +36,7 @@ function clearGuesses() {
   for (var i = 0; i < guesses.length; i++) {
     var currGuess = guesses.item(i);
 
-    switch(i % 4) {
+    switch(i % 5) {
       case (0):
         currGuess.textContent = "NAME";
         break;
@@ -44,9 +44,12 @@ function clearGuesses() {
         currGuess.textContent = "GEN";
         break;
       case (2):
-        currGuess.textContent = "EVO. STAGE";
+        currGuess.textContent = "EVO.";
         break;
       case (3):
+        currGuess.textContent = "POKÉDEX";
+        break;
+      case (4):
         currGuess.textContent = "TYPE(S)";
         break;
     }
@@ -61,7 +64,7 @@ function endGame(won) {
   document.getElementById("guessButton").textContent = "AGAIN";
   document.getElementById("searchBar").disabled = true;
 
-  window.scrollTo(0, window.innerHeight * 0.33);
+  window.scrollTo(0, 20);
 
   if(won == 0) {
     document.getElementById("resultText").textContent = "You successfully found the mystery Pokemon in " + (CURR_GUESS + 1) + " guesses!";
@@ -183,11 +186,7 @@ function App() {
         // Use the updated name here
         pokemonName = res.data.name;
 
-        populateGuess(
-          pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1),
-          ANSWER_POKEMON,
-          0
-        );
+        populateGuess(pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1), ANSWER_POKEMON,0);
 
         var type = res.data.types[0].type.name;
         type = type.charAt(0).toUpperCase() + type.slice(1);
@@ -196,7 +195,8 @@ function App() {
           type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
         }
 
-        populateGuess(type, ANSWER_TYPE, 3);
+        populateGuess(type, ANSWER_TYPE, 4);
+        populateGuess(String(res.data.id), String(ANSWER_NUM), 3);
 
         return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
       })
@@ -248,12 +248,12 @@ function App() {
     //setTrigger(false);
   };
 
-  async function setLabelColour(curr_label, value, expected, isTypes) {
+  async function setLabelColour(curr_label, value, expected, index) {
     if (expected.toLowerCase() === value.toLowerCase()) {
       curr_label.style.backgroundColor = "#5be38b";
       curr_label.style.color = "black";
       return;
-    } else if (isTypes) {
+    } else if (index == 4) {
       var valueTypes = value.split("/");
       var expectedTypes = expected.split("/");
 
@@ -266,6 +266,12 @@ function App() {
           }
         }
       }
+    } else if (index == 3) {
+      if (Math.abs(value - expected) <= 50) {
+        curr_label.style.backgroundColor = "#ffc700";
+        curr_label.style.color = "black";
+        return;
+      }
     }
 
     curr_label.style.color = "white";
@@ -275,7 +281,7 @@ function App() {
   const populateGuess = (value, expected, index, errors) => {
     const curr_label = document
       .getElementsByClassName("guess real")
-      .item((CURR_GUESS) * 4 + index);
+      .item((CURR_GUESS) * 5 + index);
 
     if (curr_label) {
       const width = curr_label.offsetWidth;
@@ -290,7 +296,7 @@ function App() {
       curr_label.style.width = width + "px";
       curr_label.style.height = height + "px";
 
-      setLabelColour(curr_label, value, expected, index == 3);
+      setLabelColour(curr_label, value, expected, index);
 
       new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
     } else {
@@ -335,18 +341,30 @@ function Header() {
     <div className="guessMenu">
       <div className="guess labelLeft">NAME</div>
       <div className="guess labelMid correct">GEN</div>
-      <div className="guess labelMid correct">EVO. STAGE</div>
+      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid">POKÉDEX</div>
       <div className="guess labelRight">TYPE(S)</div>
     </div>
   );
 
   // Partial instructions example
-  const yellowExample = (
+  const yellowExample1 = (
     <div className="guessMenu">
       <div className="guess labelLeft">NAME</div>
       <div className="guess labelMid">GEN</div>
-      <div className="guess labelMid">EVO. STAGE</div>
+      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid">POKÉDEX</div>
       <div className="guess labelRight partial">TYPE(S)</div>
+    </div>
+  );
+
+  const yellowExample2 = (
+    <div className="guessMenu">
+      <div className="guess labelLeft">NAME</div>
+      <div className="guess labelMid">GEN</div>
+      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid partial">POKÉDEX</div>
+      <div className="guess labelRight">TYPE(S)</div>
     </div>
   );
 
@@ -362,13 +380,17 @@ function Header() {
           • Guess the mystery pokemon in 10 guesses!
         </p>
         {greenExample}
-        <p className="instructionText">• Green means a correct match.</p>
-        {yellowExample}
+        <p className="instructionText">• Green means a correct match. The 'EVO.' column refers to a pokemon's stage in their evolution chain (Eg: Pikachu = 1, Raichu = 2).</p>
+        {yellowExample1}
         <p className="instructionText">
           • Yellow in the 'types' column means you have at least one type
           correct (Eg: guess has ice/water, answer is water/rock).<br></br>
+        </p>
+        {yellowExample2}
+        <p className="instructionText">
+          • Yellow in the 'pokedex' column means the mystery pokemon's dex number within 50 of your guess.<br></br>
           <br></br>• You can change which generations the mystery pokemon is
-          chosen from.
+          chosen from under settings.
         </p>
         <button
           className="instructionsButton"
@@ -384,6 +406,7 @@ function Header() {
   const guessResults = Array.from({ length: 10 }, (_, index) => (
     <div className="horizontalDiv">
       <p className="guessResultText leftMargin" id="guessResultText">▆ </p>
+      <p className="guessResultText" id="guessResultText">▆ </p>
       <p className="guessResultText" id="guessResultText">▆ </p>
       <p className="guessResultText" id="guessResultText">▆ </p>
       <p className="guessResultText" id="guessResultText">▆ </p>
@@ -580,7 +603,8 @@ function Menu() {
     <div className="guessMenu">
       <div className="guess labelLeft real">NAME</div>
       <div className="guess labelMid real">GEN</div>
-      <div className="guess labelMid real">EVO. STAGE</div>
+      <div className="guess labelMid real">EVO.</div>
+      <div className="guess labelMid real">POKÉDEX</div>
       <div className="guess labelRight real">TYPE(S)</div>
     </div>
   ));
@@ -590,7 +614,8 @@ function Menu() {
       <div className="labelMenu">
         <div className="guessLabel labelLeft">NAME</div>
         <div className="guessLabel labelMid">GEN</div>
-        <div className="guessLabel labelMid">EVO. STAGE</div>
+        <div className="guessLabel labelMid">EVO.</div>
+        <div className="guessLabel labelMid">POKÉDEX</div>
         <div className="guessLabel labelRight">TYPE(S)</div>
       </div>
       {guesses}
