@@ -226,7 +226,7 @@ function App() {
   const populateGuess = (value, expected, index, errors) => {
     const curr_label = document
       .getElementsByClassName("guess real")
-      .item((CURR_GUESS - 1) * 4 + index);
+      .item((CURR_GUESS) * 4 + index);
 
     if (curr_label) {
       const width = curr_label.offsetWidth;
