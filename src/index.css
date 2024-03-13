@@ -102,6 +102,11 @@ input {
   background-color: black;
 }
 
+.shrink {
+  margin-left: 3px;
+  transform: scale(0.91);
+}
+
 .guessLabel {
   border: 1px solid gray;
   margin-right: 5px;
@@ -230,6 +235,10 @@ input {
   visibility: hidden;
 }
 
+.topMargin {
+  margin-top: 15px;
+}
+
 .instructions {
   background-color: black;
   border: 1px solid gray;
@@ -244,6 +253,15 @@ input {
   font-size: 22px;
   padding-top: 5px;
   padding-bottom: 20px;
+  text-align: left;
+}
+
+.smallInstructionText {
+  font-size: 16px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   text-align: left;
 }
 
@@ -287,6 +305,18 @@ input {
   padding-bottom: 25px;
 }
 
+.spacing350 {
+  margin-left: 350px;
+}
+
+.spacing75 {
+  margin-left: 75px;
+}
+
+.spacing100 {
+  margin-left: 275px;
+}
+
 .footer {
   display: flex;
   align-items: center;
@@ -307,10 +337,6 @@ input {
 
 .concedeButton:hover {
   cursor: pointer;
-}
-
-.padding30 {
-  padding: 30px;
 }
 
 .resultImage {
