@@ -1,7 +1,6 @@
 import "./index.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { responsivePropType } from "react-bootstrap/esm/createUtilityClasses";
 import { Container, Row, Col } from "react-bootstrap";
 
 /* VARIABLES */
@@ -17,55 +16,113 @@ var ANSWER_SPRITE;
 var GEN_MIN = 1;
 var GEN_MAX = 9;
 
-
-//const[minValue , setMinValue] = useState(0);
-//const[maxValue, setMaxValue] = useState(9);
-
 /* FUNCTIONS */
 
-function endGame(won) {
-  document.getElementById("gameEnd").style.visibility = "visible";
+// Hide the reults
+function hideResults() {
+  document.getElementById("gameEnd").style.visibility = "hidden";
+}
 
-  if(won)
-  {
-    document.getElementById("resultText").textContent = "You successfully found the mystery pokemon in " + CURR_GUESS + " guesses!";
-    document.getElementById("resultText").style.color = "#5be38b";
+// Restart the game
+function clearGuesses() {
+  hideResults();
+  document.getElementById("guessButton").textContent = "GUESS";
+  document.getElementById("searchBar").disabled = false;
+
+  // Reset the turns
+  CURR_GUESS = 0;
+  document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+
+  // Clear the guesses
+  var guesses = document.getElementsByClassName("guess real");
+  for (var i = 0; i < guesses.length; i++) {
+    var currGuess = guesses.item(i);
+
+    switch (i % 5) {
+      case 0:
+        currGuess.textContent = "NAME";
+        break;
+      case 1:
+        currGuess.textContent = "GEN";
+        break;
+      case 2:
+        currGuess.textContent = "EVO.";
+        break;
+      case 3:
+        currGuess.textContent = "POKÉDEX";
+        break;
+      case 4:
+        currGuess.textContent = "TYPE(S)";
+        break;
+    }
+
+    currGuess.style.backgroundColor = "#30353c";
+    currGuess.style.color = "#30353c";
   }
-  else
-  {
-    document.getElementById("resultText").textContent = "You ran out of guesses, better luck next time!";
+
+  var sprites = document.getElementsByClassName("guessImage");
+  for (var i = 0; i < sprites.length; i++) {
+    sprites[i].style.visibility = "hidden";
+    sprites[i].src = "images/loadingwheel.gif";
+  }
+}
+
+// End the game, won: 0 = guessed, 1 = ran out of guesses, 2 = gave up
+function endGame(won) {
+  document.getElementById("guessButton").textContent = "AGAIN";
+  document.getElementById("searchBar").disabled = true;
+
+  window.scrollTo(0, 20);
+
+  if (won == 0) {
+    document.getElementById("resultText").textContent =
+      "You successfully found the mystery Pokemon in " +
+      (CURR_GUESS + 1) +
+      " guesses!";
+    document.getElementById("resultText").style.color = "#5be38b";
+  } else {
+    if (won == 1) {
+      document.getElementById("resultText").textContent =
+        "You ran out of guesses, better luck next time!";
+    } else {
+      document.getElementById("resultText").textContent =
+        "This was the mystery Pokemon!";
+    }
     document.getElementById("resultText").style.color = "#f23333";
   }
 
   document.getElementById("resultTitle").textContent = ANSWER_POKEMON;
-  document.getElementById("resultGen").textContent = "• Generation " + ANSWER_GENERATION;
-  document.getElementById("resultEvo").textContent = "• Evolution Stage " + ANSWER_EVOLUTION_STAGE;
+  document.getElementById("resultGen").textContent =
+    "• Generation " + ANSWER_GENERATION;
+  document.getElementById("resultEvo").textContent =
+    "• Evolution Stage " + ANSWER_EVOLUTION_STAGE;
   document.getElementById("resultType").textContent = "• " + ANSWER_TYPE;
   document.getElementById("resultNum").textContent = "• Pokedex #" + ANSWER_NUM;
   document.getElementById("resultImage").src = ANSWER_SPRITE;
 
   var guesses = document.getElementsByClassName("guess real");
-  var results =  document.getElementsByClassName("guessResultText");
+  var results = document.getElementsByClassName("guessResultText");
 
   for (var i = 0; i < guesses.length; i++) {
     var colour = guesses.item(i).style.backgroundColor;
 
-    if(colour == "") {
+    if (colour == "") {
       colour = "#30353c";
     }
 
     results.item(i).style.color = colour;
   }
+
+  document.getElementById("gameEnd").style.visibility = "visible";
 }
 
 function App() {
-  const[minValue , setMinValue] = useState(0);
-const[maxValue, setMaxValue] = useState(9);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(9);
   const [search, setSearch] = useState("");
   const [errors, setErrors] = useState("");
   const [trigger, setTrigger] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
 
   function getEvoStages(data, targetName, current) {
     current++;
@@ -88,12 +145,10 @@ const[maxValue, setMaxValue] = useState(9);
     return null;
   }
 
-  function getTypes(res)
-  {
+  function getTypes(res) {
     var type = res.data.types[0].type.name;
     type = type.charAt(0).toUpperCase() + type.slice(1);
-    if(res.data.types.length == 2)
-    {
+    if (res.data.types.length == 2) {
       const type2 = res.data.types[1].type.name;
       type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
     }
@@ -101,54 +156,65 @@ const[maxValue, setMaxValue] = useState(9);
     return type;
   }
 
-  const handleSearch = async (query) =>
-  {
+  const handleSearch = async (query) => {
+    document.getElementsByClassName("guessImage")[
+      CURR_GUESS + 1
+    ].style.visibility = "visible";
+
     // Generate a new mystery pokemon at the start of the game
-    if(CURR_GUESS == 0)
-    {
-      const randomNum = Math.floor(Math.random() * 151); // TEMP: GEN 1
+    if (CURR_GUESS == 0) {
+      const randomNum = Math.floor(
+        Math.random() * (GEN_MAX - GEN_MIN + 1) + GEN_MIN
+      );
+      console.log(randomNum); // TEMP: GEN 1
       var randomPokemon;
       var pokemonUrl;
       var speciesRes;
 
-      await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`).then((res) => {
-        randomPokemon = res.data.results[randomNum].name;
-        ANSWER_POKEMON = randomPokemon.charAt(0).toUpperCase() + randomPokemon.slice(1);
-        pokemonUrl = res.data.results[randomNum].url;
-      });
+      await axios
+        .get(`https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`)
+        .then((res) => {
+          randomPokemon = res.data.results[randomNum].name;
+          ANSWER_POKEMON =
+            randomPokemon.charAt(0).toUpperCase() + randomPokemon.slice(1);
+          pokemonUrl = res.data.results[randomNum].url;
+        });
 
-      await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${randomPokemon}`).then((res) => {
-        speciesRes = res;
-        ANSWER_GENERATION = res.data.generation.name.slice(11).toUpperCase();
-      });
+      await axios
+        .get(`https://pokeapi.co/api/v2/pokemon-species/${randomPokemon}`)
+        .then((res) => {
+          speciesRes = res;
+          ANSWER_GENERATION = res.data.generation.name.slice(11).toUpperCase();
+        });
 
       await axios.get(speciesRes.data.evolution_chain.url).then((res) => {
-        ANSWER_EVOLUTION_STAGE = getEvoStages(JSON.parse(JSON.stringify(res.data))["chain"], randomPokemon, 0);
+        ANSWER_EVOLUTION_STAGE = getEvoStages(
+          JSON.parse(JSON.stringify(res.data))["chain"],
+          randomPokemon,
+          0
+        );
       });
 
       await axios.get(pokemonUrl).then((res) => {
-        ANSWER_SPRITE = res.data.sprites["other"]["official-artwork"]["front_default"];
+        ANSWER_SPRITE =
+          res.data.sprites["other"]["official-artwork"]["front_default"];
         ANSWER_NUM = res.data.id;
-        ANSWER_TYPE = getTypes(res)
-      })
+        ANSWER_TYPE = getTypes(res);
+      });
 
       console.log(ANSWER_POKEMON);
     }
-    
+
     var pokemonName;
+    let values = new Array(5);
     setIsLoading(true);
 
     await axios
       .get(`https://pokeapi.co/api/v2/pokemon/${query}`)
       .then((res) => {
-        // Use the updated name here
         pokemonName = res.data.name;
 
-        populateGuess(
-          pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1),
-          ANSWER_POKEMON,
-          0
-        );
+        values[0] = pokemonName.charAt(0).toUpperCase() + pokemonName.slice(1);
 
         var type = res.data.types[0].type.name;
         type = type.charAt(0).toUpperCase() + type.slice(1);
@@ -157,14 +223,18 @@ const[maxValue, setMaxValue] = useState(9);
           type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
         }
 
-        populateGuess(type, ANSWER_TYPE, 3);
+        values[3] = String(res.data.id);
+        values[4] = type;
+
+        document.getElementsByClassName("guessImage")[CURR_GUESS + 1].src =
+          res.data.sprites["other"]["official-artwork"]["front_default"];
 
         return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
       })
       .then((speciesRes) => {
         const genName = speciesRes.data.generation.name;
         const sliceName = genName.slice(11).toUpperCase();
-        populateGuess(sliceName, ANSWER_GENERATION, 1);
+        values[1] = sliceName;
 
         return axios.get(speciesRes.data.evolution_chain.url);
       })
@@ -174,7 +244,7 @@ const[maxValue, setMaxValue] = useState(9);
           pokemonName,
           0
         );
-        populateGuess(evolutionStage, ANSWER_EVOLUTION_STAGE, 2);
+        values[2] = evolutionStage;
       })
       .catch((err) => {
         if (err.response) {
@@ -195,26 +265,29 @@ const[maxValue, setMaxValue] = useState(9);
         setIsLoading(false);
       });
 
-      if(pokemonName == ANSWER_POKEMON.toLowerCase())
-      {
-        endGame(true);
-      }
-      else if (CURR_GUESS == 10)
-      {
-        endGame(false);
-      }
-    
+    await populateGuess(values[0], ANSWER_POKEMON, 0);
+    await populateGuess(values[1], ANSWER_GENERATION, 1);
+    await populateGuess(values[2], ANSWER_EVOLUTION_STAGE, 2);
+    await populateGuess(values[3], String(ANSWER_NUM), 3);
+    await populateGuess(values[4], ANSWER_TYPE, 4);
+
+    if (pokemonName == ANSWER_POKEMON.toLowerCase()) {
+      endGame(0);
+    } else if (CURR_GUESS + 1 == 10) {
+      endGame(1);
+    }
+
     setErrors();
 
     //setTrigger(false);
   };
 
-  async function setLabelColour(curr_label, value, expected, isTypes) {
+  async function setLabelColour(curr_label, value, expected, index) {
     if (expected.toLowerCase() === value.toLowerCase()) {
       curr_label.style.backgroundColor = "#5be38b";
       curr_label.style.color = "black";
       return;
-    } else if (isTypes) {
+    } else if (index == 4) {
       var valueTypes = value.split("/");
       var expectedTypes = expected.split("/");
 
@@ -227,16 +300,22 @@ const[maxValue, setMaxValue] = useState(9);
           }
         }
       }
+    } else if (index == 3) {
+      if (Math.abs(value - expected) <= 50) {
+        curr_label.style.backgroundColor = "#ffc700";
+        curr_label.style.color = "black";
+        return;
+      }
     }
 
     curr_label.style.color = "white";
   }
 
   // Fill a guess' value
-  const populateGuess = (value, expected, index, errors) => {
+  const populateGuess = async (value, expected, index, errors) => {
     const curr_label = document
       .getElementsByClassName("guess real")
-      .item((CURR_GUESS) * 4 + index);
+      .item(CURR_GUESS * 5 + index);
 
     if (curr_label) {
       const width = curr_label.offsetWidth;
@@ -251,9 +330,12 @@ const[maxValue, setMaxValue] = useState(9);
       curr_label.style.width = width + "px";
       curr_label.style.height = height + "px";
 
-      setLabelColour(curr_label, value, expected, index == 3);
+      setLabelColour(curr_label, value, expected, index);
 
-      new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
+      await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
+
+      curr_label.style.transition = "none";
+      curr_label.style.transform = "rotateX(0deg)";
     } else {
       console.error("curr_label is null");
       return;
@@ -262,11 +344,7 @@ const[maxValue, setMaxValue] = useState(9);
 
   return (
     <div className="app">
-      <Header 
-      minValue = {minValue}
-      maxValue = {maxValue}
-      setMinValue = {setMinValue}
-      setMaxValue = {setMaxValue}/>
+      <Header />
       <Search
         setSearch={setSearch}
         search={search}
@@ -283,23 +361,22 @@ const[maxValue, setMaxValue] = useState(9);
   );
 }
 
-function Header({setMinValue,setMaxValue,minValue,maxValue}) {
+function Header() {
   // Show the instructions
   function showInstructions() {
     document.getElementById("instructions").style.visibility = "visible";
-    document.getElementById("instructions").style.height = '100%';
+    document.getElementById("instructions").style.height = "100%";
   }
 
   //Show the generation options
-  function showOptions(){
+  function showOptions() {
     document.getElementById("options").style.visibility = "visible";
-    document.getElementById("options").style.height= '100%';
+    document.getElementById("options").style.height = "100%";
   }
 
   //Hide the generation options
-  function hideOptions(){
+  function hideOptions() {
     document.getElementById("options").style.visibility = "hidden";
-
   }
 
   // Hide the instructions
@@ -307,122 +384,148 @@ function Header({setMinValue,setMaxValue,minValue,maxValue}) {
     document.getElementById("instructions").style.visibility = "hidden";
   }
 
-  // Hide the reults
-  function hideResults() {
-    document.getElementById("gameEnd").style.visibility = "hidden";
-  }
-
   // Correct instructions example
   const greenExample = (
     <div className="guessMenu">
       <div className="guess labelLeft">NAME</div>
       <div className="guess labelMid correct">GEN</div>
-      <div className="guess labelMid correct">EVO. STAGE</div>
+      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid">POKÉDEX</div>
       <div className="guess labelRight">TYPE(S)</div>
     </div>
   );
 
   // Partial instructions example
-  const yellowExample = (
+  const yellowExample1 = (
     <div className="guessMenu">
       <div className="guess labelLeft">NAME</div>
       <div className="guess labelMid">GEN</div>
-      <div className="guess labelMid">EVO. STAGE</div>
+      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid">POKÉDEX</div>
       <div className="guess labelRight partial">TYPE(S)</div>
     </div>
   );
 
+  const yellowExample2 = (
+    <div className="guessMenu">
+      <div className="guess labelLeft">NAME</div>
+      <div className="guess labelMid">GEN</div>
+      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid partial">POKÉDEX</div>
+      <div className="guess labelRight">TYPE(S)</div>
+    </div>
+  );
   const generationminChoice = (min) => {
     let result;
-    switch(true){
+    switch (true) {
       case min === 0:
-        return result = 1;
+        return (result = 1);
         break;
       case min === 1:
-        return result = 151;
+        return (result = 151);
         break;
       case min === 2:
-       return result = 251;
-       break;
+        return (result = 251);
+        break;
       case min === 3:
-        return result = 386;
+        return (result = 386);
         break;
       case min === 4:
-        return result = 493;
+        return (result = 493);
         break;
       case min === 5:
-        return result = 649;
+        return (result = 649);
         break;
       case min === 6:
-        return result = 721;
+        return (result = 721);
         break;
       case min === 7:
-        return result = 809;
+        return (result = 809);
         break;
-      case min ===8:
-        return result = 905;
+      case min === 8:
+        return (result = 905);
         break;
       case min === 9:
-        return result = 1015;
-        break;       
-      
-    return result;
+        return (result = 1015);
+        break;
+      default:
+        result = 1;
 
-  }
-}
-
-  const generationmaxChoice = (max) => {
-
-    let result2;
-    switch(true){
-    case max === 1:
-        return result2 = 151;
-        break;
-      case max === 2:
-       return result2 = 251;
-       break;
-      case max === 3:
-        return result2 = 386;
-        break;
-      case max === 4:
-        return result2 = 493;
-        break;
-      case max === 5:
-        return result2 = 649;
-        break;
-      case max === 6:
-        return result2 = 721;
-        break;
-      case max === 7:
-        return result2 = 809;
-        break;
-      case max ===8:
-        return result2 = 905;
-        break;
-      case max === 9:
-        return result2 = 1015;
-        break;       
-         default:
-          result2 = 0;
+        return result;
     }
-    return result2;
-  } 
-  const handleMinChange = (event) => {
-    GEN_MIN = generationminChoice(parseInt(event.target.value));
-  }
-  const handleMaxChange = (event) => {
-    GEN_MAX = generationmaxChoice(parseInt(event.target.value));
   };
 
-  const optionPicker = () => (
+  const generationmaxChoice = (max) => {
+    let result2;
+    switch (true) {
+      case max === 1:
+        return (result2 = 151);
+        break;
+      case max === 2:
+        return (result2 = 251);
+        break;
+      case max === 3:
+        return (result2 = 386);
+        break;
+      case max === 4:
+        return (result2 = 493);
+        break;
+      case max === 5:
+        return (result2 = 649);
+        break;
+      case max === 6:
+        return (result2 = 721);
+        break;
+      case max === 7:
+        return (result2 = 809);
+        break;
+      case max === 8:
+        return (result2 = 905);
+        break;
+      case max === 9:
+        return (result2 = 1015);
+        break;
+      default:
+        result2 = 1015;
+    }
+    return result2;
+  };
+  const handleMinChange = (event) => {
+    GEN_MIN = generationminChoice(parseInt(event.target.value));
+    console.log(GEN_MIN);
+  };
+  const handleMaxChange = (event) => {
+    GEN_MAX = generationmaxChoice(parseInt(event.target.value));
+    console.log(GEN_MAX);
+  };
+
+  const optionPicker = (
     <div className="optionMenu">
       <div className="optionGroup">
         <label className="optionText">Min:</label>
-        <input type="number" id="quantity" name="quantity" min="0" max="9" step="1" value={minValue} onChange={handleMinChange} />
+        <input
+          type="number"
+          id="quantity"
+          placeholder="0"
+          name="quantity"
+          min="0"
+          max="9"
+          step="1"
+          onChange={handleMinChange}
+        />
       </div>
       <div className="optionGroup">
         <label className="optionText">Max:</label>
-        <input type="number" id="quantity" name="quantity" min="0" max="9" step="1" value={maxValue} onChange={handleMaxChange} />
+        <input
+          type="number"
+          id="quantity"
+          placeholder="9"
+          name="quantity"
+          min="0"
+          max="9"
+          step="1"
+          onChange={handleMaxChange}
+        />
       </div>
     </div>
   );
@@ -437,18 +540,13 @@ function Header({setMinValue,setMaxValue,minValue,maxValue}) {
           Choose the generation range of the mystery Pokemon!
         </p>
         {optionPicker}
-        
-        
-        <button
-          className="instructionsButton"
-          onClick={() => hideOptions()}
-        >
+
+        <button className="instructionsButton" onClick={() => hideOptions()}>
           PLAY!
         </button>
       </div>
     </div>
-    
-  )
+  );
 
   // Instructions popup
   const instructions = (
@@ -462,13 +560,21 @@ function Header({setMinValue,setMaxValue,minValue,maxValue}) {
           • Guess the mystery pokemon in 10 guesses!
         </p>
         {greenExample}
-        <p className="instructionText">• Green means a correct match.</p>
-        {yellowExample}
+        <p className="instructionText">
+          • Green means a correct match. The 'EVO.' column refers to a pokemon's
+          stage in their evolution chain (Eg: Chamander = 1, Charizard = 3).
+        </p>
+        {yellowExample1}
         <p className="instructionText">
           • Yellow in the 'types' column means you have at least one type
           correct (Eg: guess has ice/water, answer is water/rock).<br></br>
+        </p>
+        {yellowExample2}
+        <p className="instructionText">
+          • Yellow in the 'pokedex' column means the mystery pokemon's dex
+          number within 50 of your guess.<br></br>
           <br></br>• You can change which generations the mystery pokemon is
-          chosen from.
+          chosen from under settings.
         </p>
         <button
           className="instructionsButton"
@@ -483,10 +589,21 @@ function Header({setMinValue,setMaxValue,minValue,maxValue}) {
   // Guess results in the end screen
   const guessResults = Array.from({ length: 10 }, (_, index) => (
     <div className="horizontalDiv">
-      <p className="guessResultText leftMargin" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
+      <p className="guessResultText leftMargin" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
     </div>
   ));
 
@@ -495,22 +612,35 @@ function Header({setMinValue,setMaxValue,minValue,maxValue}) {
     <div className="shadowBackground" id="gameEnd">
       <div className="instructions">
         <p className="closeButton" onClick={() => hideResults()}>
-            ✖
+          ✖
         </p>
-        <h5 className="title" id="resultTitle">Bulbasaur</h5>
-        <p id="resultText" className="centreText">You guessed the mystery pokemon in 1 guess!</p>
+        <h5 className="title" id="resultTitle">
+          Bulbasaur
+        </h5>
+        <p id="resultText" className="centreText">
+          You guessed the mystery pokemon in 1 guess!
+        </p>
         <div className="horizontalDiv">
-          <div>
-            {guessResults}
-          </div>
-          <img className="resultImage" id="resultImage"/>
+          <div>{guessResults}</div>
+          <img className="resultImage" id="resultImage" />
           <div className="padding30">
-            <p className="instructionText" id="resultGen">• Generation I</p>
-            <p className="instructionText" id="resultEvo">• Evolution Stage I</p>
-            <p className="instructionText" id="resultType">• Grass / Poison</p>
-            <p className="instructionText" id="resultNum">• Pokedex #</p>
+            <p className="instructionText" id="resultGen">
+              • Generation I
+            </p>
+            <p className="instructionText" id="resultEvo">
+              • Evolution Stage I
+            </p>
+            <p className="instructionText" id="resultType">
+              • Grass / Poison
+            </p>
+            <p className="instructionText" id="resultNum">
+              • Pokedex #
+            </p>
           </div>
         </div>
+        <button className="guessButton" onClick={() => clearGuesses()}>
+          PLAY AGAIN
+        </button>
       </div>
     </div>
   );
@@ -522,9 +652,10 @@ function Header({setMinValue,setMaxValue,minValue,maxValue}) {
         <img src="images/pokeball.png" className="headerImageLeft" />
         <h1 className="redText">Poké</h1>
         <h1>Guess</h1>
-        <img src = "images/gear.png"
-        className = "headerImagegen" 
-        onClick = {() => showOptions()}
+        <img
+          src="images/gear.png"
+          className="headerImagegen"
+          onClick={() => showOptions()}
         ></img>
         <img
           src="images/questionmark.png"
@@ -546,9 +677,6 @@ function Search({
   submitGuess,
   handleSearch,
   errors,
-  setTrigger,
-  trigger,
-  setErrors,
   isLoading,
 }) {
   const [name, setName] = useState([]);
@@ -563,20 +691,27 @@ function Search({
 
   // Submit a guess
   async function submitGuess() {
-    const input = document.getElementById("searchBar");
-    let value = input.value.toLowerCase();
-    input.value = "";
-    await setSearch(value);
-    await handleSearch(value);
-
-    if (search.trim().length === 0) {
-      setEmpty("Please enter a pokemon");
+    if (document.getElementById("guessButton").textContent == "AGAIN") {
+      clearGuesses();
     } else {
-      setEmpty();
+      const input = document.getElementById("searchBar");
+      let value = input.value.toLowerCase();
+      input.value = "";
 
-      if (value.trim().length > 0) {
-        CURR_GUESS++;
-        document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+      await setSearch(value);
+      await handleSearch(value);
+
+      if (search.trim().length === 0) {
+        setEmpty("Please enter a pokemon");
+      } else {
+        setEmpty();
+
+        if (value.trim().length > 0) {
+          CURR_GUESS++;
+          document.getElementById("concede").style.visibility = "visible";
+          document.getElementById("counter").textContent =
+            CURR_GUESS + " of 10";
+        }
       }
     }
   }
@@ -620,6 +755,7 @@ function Search({
               </h2>
               <button
                 className="guessButton"
+                id="guessButton"
                 onClick={submitGuess}
                 disabled={isLoading}
               >
@@ -667,48 +803,17 @@ function Search({
 }
 
 function Menu() {
-
   function concede() {
-    endGame(false);
-
-    //clearGuesses();
-  }
-
-  function clearGuesses() {
-    // Reset the turns
-    CURR_GUESS = 0;
-    document.getElementById("counter").textContent = CURR_GUESS + " of 10";
-
-    // Clear the guesses
-    var guesses = document.getElementsByClassName("guess real");
-    for (var i = 0; i < guesses.length; i++) {
-      var currGuess = guesses.item(i);
-
-      switch(i % 4) {
-        case (0):
-          currGuess.textContent = "NAME";
-          break;
-        case (1):
-          currGuess.textContent = "GEN";
-          break;
-        case (2):
-          currGuess.textContent = "EVO. STAGE";
-          break;
-        case (3):
-          currGuess.textContent = "TYPE(S)";
-          break;
-      }
-
-      currGuess.style.backgroundColor = "#30353c"; 
-      currGuess.style.color = "#30353c";
-    }
+    endGame(2);
   }
 
   const guesses = Array.from({ length: 10 }, (_, index) => (
     <div className="guessMenu">
+      <img src="images/loadingwheel.gif" className="guessImage invisible" />
       <div className="guess labelLeft real">NAME</div>
       <div className="guess labelMid real">GEN</div>
-      <div className="guess labelMid real">EVO. STAGE</div>
+      <div className="guess labelMid real">EVO.</div>
+      <div className="guess labelMid real">POKÉDEX</div>
       <div className="guess labelRight real">TYPE(S)</div>
     </div>
   ));
@@ -716,14 +821,18 @@ function Menu() {
   return (
     <div className="menu">
       <div className="labelMenu">
+        <img src="images/pokeball.png" className="guessImage invisible" />
         <div className="guessLabel labelLeft">NAME</div>
         <div className="guessLabel labelMid">GEN</div>
-        <div className="guessLabel labelMid">EVO. STAGE</div>
+        <div className="guessLabel labelMid">EVO.</div>
+        <div className="guessLabel labelMid">POKÉDEX</div>
         <div className="guessLabel labelRight">TYPE(S)</div>
       </div>
       {guesses}
       <div className="footer">
-        <button className="concedeButton" onClick={concede}>GIVE UP</button>
+        <button className="concedeButton" id="concede" onClick={concede}>
+          GIVE UP
+        </button>
       </div>
     </div>
   );

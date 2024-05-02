@@ -19,7 +19,7 @@ h2 {
 
 .app {
   width: 100%;
-  height: 100vh;
+  height: 160vh;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
 }
@@ -39,7 +39,8 @@ h2 {
   padding: 5px;
   border-radius: 10px;
   border-width: 2px;
-  width: 390px;
+  width: 450px;
+  margin-left: 20px;
 }
 
 .inputForm:focus {
@@ -174,7 +175,8 @@ input {
 }
 
 .counter {
-  padding: 15px 20px 15px 20px;
+  padding: 15px 20px 15px 25px;
+  font-size: 20px;
   width: 120px;
 }
 
@@ -205,14 +207,12 @@ input {
   margin-top: 22.5px;
   margin-left: 10px;
 }
-.headerImagegen{
+.headerImagegen {
   width: 60px;
   height: 60px;
   margin-top: 22.5px;
   margin-left: 100px;
 }
-
-
 
 .headerImageRight:hover {
   cursor: pointer;
@@ -226,10 +226,14 @@ input {
   top: 0px;
   left: 0px;
   width: 100%;
-  height: 100%;
+  height: 160%;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.invisible {
+  visibility: hidden;
 }
 
 .instructions {
@@ -238,9 +242,11 @@ input {
   border-radius: 10px;
   width: 675px;
   padding: 15px;
+  position: absolute;
+  top: 50px;
 }
 
-.options{
+.options {
   background-color: black;
   border: 1px solid gray;
   border-radius: 10px;
@@ -248,18 +254,15 @@ input {
   padding: 15px;
 }
 
-
-
-.optionMenu{
-  
-    /*display: flex;
+.optionMenu {
+  /*display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     margin-top: 10px;
     color: white;
     background-color: black;*/
-    display: flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -267,14 +270,12 @@ input {
   margin-bottom: 10px;
   color: white;
   background-color: black;
-  
 }
 
-.optionText{
-  font-size:22px;
-  text-align:center;
+.optionText {
+  font-size: 22px;
+  text-align: center;
 }
-
 
 .instructionText {
   font-size: 22px;
@@ -338,6 +339,7 @@ input {
   border: none;
   font-size: 16px;
   margin-top: 20px;
+  visibility: hidden;
 }
 
 .concedeButton:hover {
@@ -355,6 +357,12 @@ input {
   margin: 45px 20px 0px 50px;
 }
 
+.guessImage {
+  width: 25px;
+  height: 25px;
+  margin-bottom: 5px;
+}
+
 .leftMargin {
   margin-left: 50px;
 }
@@ -367,5 +375,3 @@ input {
 #errorMessage {
   color: red;
 }
-
-
