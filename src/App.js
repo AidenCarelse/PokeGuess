@@ -70,7 +70,7 @@ function endGame(won) {
   document.getElementById("guessButton").textContent = "AGAIN";
   document.getElementById("searchBar").disabled = true;
 
-  window.scrollTo(0, 20);
+  window.scrollTo(0, 0);
 
   if(won == 0) {
     document.getElementById("resultText").textContent = "You successfully found the mystery Pokemon in " + (CURR_GUESS + 1) + " guesses!";
@@ -288,6 +288,12 @@ function App() {
         curr_label.style.color = "black";
         return;
       }
+    } else if (index == 0) {
+      if(value.toLowerCase()[0] == expected.toLowerCase()[0]) {
+        curr_label.style.backgroundColor = "#ffc700";
+        curr_label.style.color = "black";
+        return;
+      }
     }
 
     curr_label.style.color = "white";
@@ -360,30 +366,20 @@ function Header() {
     <div className="guessMenu">
       <div className="guess labelLeft">NAME</div>
       <div className="guess labelMid correct">GEN</div>
-      <div className="guess labelMid">EVO.</div>
+      <div className="guess labelMid correct">EVO.</div>
       <div className="guess labelMid">POKÉDEX</div>
       <div className="guess labelRight">TYPE(S)</div>
     </div>
   );
 
   // Partial instructions example
-  const yellowExample1 = (
+  const yellowExample = (
     <div className="guessMenu">
-      <div className="guess labelLeft">NAME</div>
-      <div className="guess labelMid">GEN</div>
-      <div className="guess labelMid">EVO.</div>
-      <div className="guess labelMid">POKÉDEX</div>
-      <div className="guess labelRight partial">TYPE(S)</div>
-    </div>
-  );
-
-  const yellowExample2 = (
-    <div className="guessMenu">
-      <div className="guess labelLeft">NAME</div>
+      <div className="guess labelLeft partial">NAME</div>
       <div className="guess labelMid">GEN</div>
       <div className="guess labelMid">EVO.</div>
       <div className="guess labelMid partial">POKÉDEX</div>
-      <div className="guess labelRight">TYPE(S)</div>
+      <div className="guess labelRight partial">TYPE(S)</div>
     </div>
   );
 
@@ -398,19 +394,34 @@ function Header() {
         <p className="instructionText">
           • Guess the mystery pokemon in 10 guesses!
         </p>
+          <div className="labelMenu shrink">
+            <div className="guessLabel labelLeft">NAME</div>
+            <div className="guessLabel labelMid">GEN</div>
+            <div className="guessLabel labelMid">EVO.</div>
+            <div className="guessLabel labelMid">POKÉDEX</div>
+            <div className="guessLabel labelRight">TYPE(S)</div>
+          </div>
         {greenExample}
-        <p className="instructionText">• Green means a correct match. The 'EVO.' column refers to a pokemon's stage in their evolution chain (Eg: Chamander = 1, Charizard = 3).</p>
-        {yellowExample1}
-        <p className="instructionText">
-          • Yellow in the 'types' column means you have at least one type
-          correct (Eg: guess has ice/water, answer is water/rock).<br></br>
-        </p>
-        {yellowExample2}
-        <p className="instructionText">
-          • Yellow in the 'pokedex' column means the mystery pokemon's dex number within 50 of your guess.<br></br>
-          <br></br>• You can change which generations the mystery pokemon is
-          chosen from under settings.
-        </p>
+        <p className="smallInstructionText">• Green means a correct match in the specified column. 'EVO.' refers to a Pokémon's stage in their evolution chain (Chamander = 1, Charizard = 3).</p>
+        <div className="horizontalDiv topMargin">
+          <p className="spacing350"></p>
+          <p className="smallInstructionText">
+            • The mystery Pokémon's dex number is within 50.<br></br>
+          </p>
+          <p className="spacing75"></p>
+        </div>
+        {yellowExample}
+        <div className="horizontalDiv">
+          <p className="smallInstructionText">
+            • The mystery Pokémon shares the same first letter.
+          </p>
+          <p className="spacing100"></p>
+          <p className="smallInstructionText">
+            • The mystery Pokémon shares at least one type.<br></br>
+          </p>
+          </div>
+        <p className="topMargin instructionText">• You can change which generations the mystery pokemon is
+            chosen from under settings.</p>
         <button
           className="instructionsButton"
           onClick={() => hideInstructions()}
