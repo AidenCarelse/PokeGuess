@@ -698,13 +698,12 @@ function Search({
       let value = input.value.toLowerCase();
       input.value = "";
 
-      await setSearch(value);
-      await handleSearch(value);
-
-      if (search.trim().length === 0) {
+      if (value.trim().length === 0) {
         setEmpty("Please enter a pokemon");
       } else {
         setEmpty();
+        await setSearch(value);
+        await handleSearch(value);
 
         if (value.trim().length > 0) {
           CURR_GUESS++;
