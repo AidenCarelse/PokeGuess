@@ -24,7 +24,7 @@ function hideResults() {
 // Restart the game
 function clearGuesses() {
   hideResults();
-  document.getElementById("guessButton").textContent = "GUESS"
+  document.getElementById("guessButton").textContent = "GUESS";
   document.getElementById("searchBar").disabled = false;
 
   // Reset the turns
@@ -36,25 +36,25 @@ function clearGuesses() {
   for (var i = 0; i < guesses.length; i++) {
     var currGuess = guesses.item(i);
 
-    switch(i % 5) {
-      case (0):
+    switch (i % 5) {
+      case 0:
         currGuess.textContent = "NAME";
         break;
-      case (1):
+      case 1:
         currGuess.textContent = "GEN";
         break;
-      case (2):
+      case 2:
         currGuess.textContent = "EVO.";
         break;
-      case (3):
+      case 3:
         currGuess.textContent = "POKÉDEX";
         break;
-      case (4):
+      case 4:
         currGuess.textContent = "TYPE(S)";
         break;
     }
 
-    currGuess.style.backgroundColor = "#30353c"; 
+    currGuess.style.backgroundColor = "#30353c";
     currGuess.style.color = "#30353c";
   }
 
@@ -72,34 +72,39 @@ function endGame(won) {
 
   window.scrollTo(0, 0);
 
-  if(won == 0) {
-    document.getElementById("resultText").textContent = "You successfully found the mystery Pokemon in " + (CURR_GUESS + 1) + " guesses!";
+  if (won == 0) {
+    document.getElementById("resultText").textContent =
+      "You successfully found the mystery Pokemon in " +
+      (CURR_GUESS + 1) +
+      " guesses!";
     document.getElementById("resultText").style.color = "#5be38b";
-  }
-  else {
-    if(won == 1) {
-      document.getElementById("resultText").textContent = "You ran out of guesses, better luck next time!";
-    }
-    else {
-      document.getElementById("resultText").textContent = "This was the mystery Pokemon!";
+  } else {
+    if (won == 1) {
+      document.getElementById("resultText").textContent =
+        "You ran out of guesses, better luck next time!";
+    } else {
+      document.getElementById("resultText").textContent =
+        "This was the mystery Pokemon!";
     }
     document.getElementById("resultText").style.color = "#f23333";
   }
 
   document.getElementById("resultTitle").textContent = ANSWER_POKEMON;
-  document.getElementById("resultGen").textContent = "• Generation " + ANSWER_GENERATION;
-  document.getElementById("resultEvo").textContent = "• Evolution Stage " + ANSWER_EVOLUTION_STAGE;
+  document.getElementById("resultGen").textContent =
+    "• Generation " + ANSWER_GENERATION;
+  document.getElementById("resultEvo").textContent =
+    "• Evolution Stage " + ANSWER_EVOLUTION_STAGE;
   document.getElementById("resultType").textContent = "• " + ANSWER_TYPE;
   document.getElementById("resultNum").textContent = "• Pokedex #" + ANSWER_NUM;
   document.getElementById("resultImage").src = ANSWER_SPRITE;
 
   var guesses = document.getElementsByClassName("guess real");
-  var results =  document.getElementsByClassName("guessResultText");
+  var results = document.getElementsByClassName("guessResultText");
 
   for (var i = 0; i < guesses.length; i++) {
     var colour = guesses.item(i).style.backgroundColor;
 
-    if(colour == "") {
+    if (colour == "") {
       colour = "#30353c";
     }
 
@@ -136,12 +141,10 @@ function App() {
     return null;
   }
 
-  function getTypes(res)
-  {
+  function getTypes(res) {
     var type = res.data.types[0].type.name;
     type = type.charAt(0).toUpperCase() + type.slice(1);
-    if(res.data.types.length == 2)
-    {
+    if (res.data.types.length == 2) {
       const type2 = res.data.types[1].type.name;
       type += "/" + type2.charAt(0).toUpperCase() + type2.slice(1);
     }
@@ -149,42 +152,52 @@ function App() {
     return type;
   }
 
-  const handleSearch = async (query) =>
-  {
-    document.getElementsByClassName("guessImage")[CURR_GUESS + 1].style.visibility = "visible";
+  const handleSearch = async (query) => {
+    document.getElementsByClassName("guessImage")[
+      CURR_GUESS + 1
+    ].style.visibility = "visible";
 
     // Generate a new mystery pokemon at the start of the game
-    if(CURR_GUESS == 0)
-    {
+    if (CURR_GUESS == 0) {
       const randomNum = Math.floor(Math.random() * 151); // TEMP: GEN 1
       var randomPokemon;
       var pokemonUrl;
       var speciesRes;
 
-      await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`).then((res) => {
-        randomPokemon = res.data.results[randomNum].name;
-        ANSWER_POKEMON = randomPokemon.charAt(0).toUpperCase() + randomPokemon.slice(1);
-        pokemonUrl = res.data.results[randomNum].url;
-      });
+      await axios
+        .get(`https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0`)
+        .then((res) => {
+          randomPokemon = res.data.results[randomNum].name;
+          ANSWER_POKEMON =
+            randomPokemon.charAt(0).toUpperCase() + randomPokemon.slice(1);
+          pokemonUrl = res.data.results[randomNum].url;
+        });
 
-      await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${randomPokemon}`).then((res) => {
-        speciesRes = res;
-        ANSWER_GENERATION = res.data.generation.name.slice(11).toUpperCase();
-      });
+      await axios
+        .get(`https://pokeapi.co/api/v2/pokemon-species/${randomPokemon}`)
+        .then((res) => {
+          speciesRes = res;
+          ANSWER_GENERATION = res.data.generation.name.slice(11).toUpperCase();
+        });
 
       await axios.get(speciesRes.data.evolution_chain.url).then((res) => {
-        ANSWER_EVOLUTION_STAGE = getEvoStages(JSON.parse(JSON.stringify(res.data))["chain"], randomPokemon, 0);
+        ANSWER_EVOLUTION_STAGE = getEvoStages(
+          JSON.parse(JSON.stringify(res.data))["chain"],
+          randomPokemon,
+          0
+        );
       });
 
       await axios.get(pokemonUrl).then((res) => {
-        ANSWER_SPRITE = res.data.sprites["other"]["official-artwork"]["front_default"];
+        ANSWER_SPRITE =
+          res.data.sprites["other"]["official-artwork"]["front_default"];
         ANSWER_NUM = res.data.id;
-        ANSWER_TYPE = getTypes(res)
-      })
+        ANSWER_TYPE = getTypes(res);
+      });
 
       console.log(ANSWER_POKEMON);
     }
-    
+
     var pokemonName;
     let values = new Array(5);
     setIsLoading(true);
@@ -206,7 +219,8 @@ function App() {
         values[3] = String(res.data.id);
         values[4] = type;
 
-        document.getElementsByClassName("guessImage")[CURR_GUESS + 1].src = res.data.sprites["other"]["official-artwork"]["front_default"];
+        document.getElementsByClassName("guessImage")[CURR_GUESS + 1].src =
+          res.data.sprites["other"]["official-artwork"]["front_default"];
 
         return axios.get(`https://pokeapi.co/api/v2/pokemon-species/${query}`);
       })
@@ -244,21 +258,18 @@ function App() {
         setIsLoading(false);
       });
 
-      await populateGuess(values[0], ANSWER_POKEMON, 0);
-      await populateGuess(values[1], ANSWER_GENERATION, 1);
-      await populateGuess(values[2], ANSWER_EVOLUTION_STAGE, 2);
-      await populateGuess(values[3], String(ANSWER_NUM), 3);
-      await populateGuess(values[4], ANSWER_TYPE, 4);
+    await populateGuess(values[0], ANSWER_POKEMON, 0);
+    await populateGuess(values[1], ANSWER_GENERATION, 1);
+    await populateGuess(values[2], ANSWER_EVOLUTION_STAGE, 2);
+    await populateGuess(values[3], String(ANSWER_NUM), 3);
+    await populateGuess(values[4], ANSWER_TYPE, 4);
 
-      if(pokemonName == ANSWER_POKEMON.toLowerCase())
-      {
-        endGame(0);
-      }
-      else if (CURR_GUESS + 1 == 10)
-      {
-        endGame(1);
-      }
-    
+    if (pokemonName == ANSWER_POKEMON.toLowerCase()) {
+      endGame(0);
+    } else if (CURR_GUESS + 1 == 10) {
+      endGame(1);
+    }
+
     setErrors();
 
     //setTrigger(false);
@@ -289,7 +300,7 @@ function App() {
         return;
       }
     } else if (index == 0) {
-      if(value.toLowerCase()[0] == expected.toLowerCase()[0]) {
+      if (value.toLowerCase()[0] == expected.toLowerCase()[0]) {
         curr_label.style.backgroundColor = "#ffc700";
         curr_label.style.color = "black";
         return;
@@ -303,7 +314,7 @@ function App() {
   const populateGuess = async (value, expected, index, errors) => {
     const curr_label = document
       .getElementsByClassName("guess real")
-      .item((CURR_GUESS) * 5 + index);
+      .item(CURR_GUESS * 5 + index);
 
     if (curr_label) {
       const width = curr_label.offsetWidth;
@@ -322,8 +333,8 @@ function App() {
 
       await new Promise((r) => setTimeout(() => r(), animationDuration * 1000));
 
-      curr_label.style.transition = 'none';
-      curr_label.style.transform = 'rotateX(0deg)';
+      curr_label.style.transition = "none";
+      curr_label.style.transform = "rotateX(0deg)";
     } else {
       console.error("curr_label is null");
       return;
@@ -353,7 +364,7 @@ function Header() {
   // Show the instructions
   function showInstructions() {
     document.getElementById("instructions").style.visibility = "visible";
-    document.getElementById("instructions").style.height = '100%';
+    document.getElementById("instructions").style.height = "100%";
   }
 
   // Hide the instructions
@@ -394,15 +405,19 @@ function Header() {
         <p className="instructionText">
           • Guess the mystery pokemon in 10 guesses!
         </p>
-          <div className="labelMenu shrink">
-            <div className="guessLabel labelLeft">NAME</div>
-            <div className="guessLabel labelMid">GEN</div>
-            <div className="guessLabel labelMid">EVO.</div>
-            <div className="guessLabel labelMid">POKÉDEX</div>
-            <div className="guessLabel labelRight">TYPE(S)</div>
-          </div>
+        <div className="labelMenu shrink">
+          <div className="guessLabel labelLeft">NAME</div>
+          <div className="guessLabel labelMid">GEN</div>
+          <div className="guessLabel labelMid">EVO.</div>
+          <div className="guessLabel labelMid">POKÉDEX</div>
+          <div className="guessLabel labelRight">TYPE(S)</div>
+        </div>
         {greenExample}
-        <p className="smallInstructionText">• Green means a correct match in the specified column. 'EVO.' refers to a Pokémon's stage in their evolution chain (Chamander = 1, Charizard = 3).</p>
+        <p className="smallInstructionText">
+          • Green means a correct match in the specified column. 'EVO.' refers
+          to a Pokémon's stage in their evolution chain (Chamander = 1,
+          Charizard = 3).
+        </p>
         <div className="horizontalDiv topMargin">
           <p className="spacing350"></p>
           <p className="smallInstructionText">
@@ -419,9 +434,11 @@ function Header() {
           <p className="smallInstructionText">
             • The mystery Pokémon shares at least one type.<br></br>
           </p>
-          </div>
-        <p className="topMargin instructionText">• You can change which generations the mystery pokemon is
-            chosen from under settings.</p>
+        </div>
+        <p className="topMargin instructionText">
+          • You can change which generations the mystery pokemon is chosen from
+          under settings.
+        </p>
         <button
           className="instructionsButton"
           onClick={() => hideInstructions()}
@@ -435,11 +452,21 @@ function Header() {
   // Guess results in the end screen
   const guessResults = Array.from({ length: 10 }, (_, index) => (
     <div className="horizontalDiv">
-      <p className="guessResultText leftMargin" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
-      <p className="guessResultText" id="guessResultText">▆ </p>
+      <p className="guessResultText leftMargin" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
+      <p className="guessResultText" id="guessResultText">
+        ▆{" "}
+      </p>
     </div>
   ));
 
@@ -448,23 +475,35 @@ function Header() {
     <div className="shadowBackground" id="gameEnd">
       <div className="instructions">
         <p className="closeButton" onClick={() => hideResults()}>
-            ✖
+          ✖
         </p>
-        <h5 className="title" id="resultTitle">Bulbasaur</h5>
-        <p id="resultText" className="centreText">You guessed the mystery pokemon in 1 guess!</p>
+        <h5 className="title" id="resultTitle">
+          Bulbasaur
+        </h5>
+        <p id="resultText" className="centreText">
+          You guessed the mystery pokemon in 1 guess!
+        </p>
         <div className="horizontalDiv">
-          <div>
-            {guessResults}
-          </div>
-          <img className="resultImage" id="resultImage"/>
+          <div>{guessResults}</div>
+          <img className="resultImage" id="resultImage" />
           <div className="padding30">
-            <p className="instructionText" id="resultGen">• Generation I</p>
-            <p className="instructionText" id="resultEvo">• Evolution Stage I</p>
-            <p className="instructionText" id="resultType">• Grass / Poison</p>
-            <p className="instructionText" id="resultNum">• Pokedex #</p>
+            <p className="instructionText" id="resultGen">
+              • Generation I
+            </p>
+            <p className="instructionText" id="resultEvo">
+              • Evolution Stage I
+            </p>
+            <p className="instructionText" id="resultType">
+              • Grass / Poison
+            </p>
+            <p className="instructionText" id="resultNum">
+              • Pokedex #
+            </p>
           </div>
         </div>
-        <button className="guessButton" onClick={() => clearGuesses()}>PLAY AGAIN</button>
+        <button className="guessButton" onClick={() => clearGuesses()}>
+          PLAY AGAIN
+        </button>
       </div>
     </div>
   );
@@ -512,26 +551,25 @@ function Search({
 
   // Submit a guess
   async function submitGuess() {
-    if(document.getElementById("guessButton").textContent == "AGAIN") {
+    if (document.getElementById("guessButton").textContent == "AGAIN") {
       clearGuesses();
-    }
-    else {
+    } else {
       const input = document.getElementById("searchBar");
       let value = input.value.toLowerCase();
       input.value = "";
 
-      await setSearch(value);
-      await handleSearch(value);
-
-      if (search.trim().length === 0) {
+      if (value.trim().length === 0) {
         setEmpty("Please enter a pokemon");
       } else {
         setEmpty();
+        await setSearch(value);
+        await handleSearch(value);
 
         if (value.trim().length > 0) {
           CURR_GUESS++;
           document.getElementById("concede").style.visibility = "visible";
-          document.getElementById("counter").textContent = CURR_GUESS + " of 10";
+          document.getElementById("counter").textContent =
+            CURR_GUESS + " of 10";
         }
       }
     }
@@ -624,7 +662,6 @@ function Search({
 }
 
 function Menu() {
-
   function concede() {
     endGame(2);
   }
@@ -652,7 +689,9 @@ function Menu() {
       </div>
       {guesses}
       <div className="footer">
-        <button className="concedeButton" id="concede" onClick={concede}>GIVE UP</button>
+        <button className="concedeButton" id="concede" onClick={concede}>
+          GIVE UP
+        </button>
       </div>
     </div>
   );
