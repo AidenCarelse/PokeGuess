@@ -421,17 +421,17 @@ input {
   }
 
   .counter {
-    padding: 8px 10px 8px 15px; /* Adjust padding to fit */
-    font-size: 12px; /* Reduce font size */
-    width: 80px; /* Narrow width */
+    padding: 8px 10px 8px 15px;
+    font-size: 12px;
+    width: 80px;
   }
 
   .inputForm {
     padding: 5px;
     border-radius: 10px;
     border-width: 2px;
-    width: 215px; /* Reduce width for smaller screen */
-    font-size: 10px; /* Smaller font size */
+    width: 215px;
+    font-size: 10px;
   }
 
   .add-form {
@@ -439,8 +439,8 @@ input {
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap: 0.4rem; /* Slightly smaller gap */
-    padding: 10px; /* Add padding for spacing */
+    gap: 0.4rem;
+    padding: 10px;
   }
 
   .shadowBackground {
@@ -467,10 +467,10 @@ input {
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    font-size: 0.8rem; /* Smaller font size for better fit */
+    font-size: 0.8rem;
     color: white;
-    border: 2px solid blue;
-    padding: 4px; /* Adjust padding */
+
+    padding: 4px;
     margin: 0;
   }
 
@@ -481,10 +481,10 @@ input {
 
   .headerImageLeft,
   .headerImageRight {
-    width: 40px; /* Smaller size */
-    height: 40px; /* Keep aspect ratio */
-    margin: 0; /* Remove extra margin */
-    border: 2px solid blue;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+
     object-fit: cover;
   }
 
